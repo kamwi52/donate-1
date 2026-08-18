@@ -256,6 +256,8 @@
 
         switchState('loading');
 
+        // Enhanced payload with transaction tracking
+        const transactionId = `ZRC-FRONT-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
         const payload = {
             donorName: document.getElementById('is-anonymous').checked ? 'Anonymous' : document.getElementById('donor-name').value,
             donationAmount: document.getElementById('custom-amount').value,
@@ -264,46 +266,72 @@
             donorCountry: document.getElementById('donor-country').value,
             donorPhone: document.getElementById('donor-phone').value,
             paymentMethod: document.querySelector('input[name="payment_method"]:checked').value,
-            messageText: document.getElementById('message-text').value
+            messageText: document.getElementById('message-text').value,
+            transactionId: transactionId  // Added for backend correlation
+        };
+        
+        // Store transaction details for support reference
+        sessionStorage.setItem('lastTransaction', JSON.stringify({
+            id: transactionId,
+            amount: payload.donationAmount,
+            currency: payload.donationCurrency,
+            timestamp: new Date().toISOString()
+        }));
+
+        let retryCount = 0;
+        const maxRetries = 3;
+        const retryDelay = 2000; // 2 seconds
+
+        const attemptPayment = async () => {
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.status === 500) {
+                    throw new Error('Payment gateway is currently unavailable. Please try again later.');
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Payment processing failed (Status: ${response.status}). Please try again.`);
+                }
+
+                const result = await response.json();
+
+                if (!result.status || result.status !== 'success') {
+                    throw new Error(result.error || 'Payment could not be processed. Please check your details and try again.');
+                }
+
+                if (!result.redirect_url) {
+                    throw new Error('Payment gateway configuration error. Please contact support.');
+                }
+
+                window.location.href = result.redirect_url;
+            } catch (err) {
+                console.error(`Donation submission attempt ${retryCount + 1} failed:`, err);
+                
+                if (retryCount < maxRetries - 1) {
+                    retryCount++;
+                    document.getElementById('error-description').innerText = 
+                        `Attempt ${retryCount} failed. Retrying in ${retryDelay/1000} seconds...`;
+                    await new Promise(resolve => setTimeout(resolve, retryDelay));
+                    return attemptPayment();
+                }
+                
+                document.getElementById('error-description').innerText = 
+                    err.message || 'Payment processing failed after multiple attempts. Please try again later.';
+                switchState('error');
+                isProcessing = false;
+
+                if (typeof logError === 'function') {
+                    logError(err);
+                }
+            }
         };
 
-        try {
-            const response = await fetch(API_ENDPOINT, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (response.status === 500) {
-                throw new Error('Payment gateway is currently unavailable. Please try again later.');
-            }
-
-            if (!response.ok) {
-                throw new Error(`Payment processing failed (Status: ${response.status}). Please try again.`);
-            }
-
-            const result = await response.json();
-
-            if (!result.status || result.status !== 'success') {
-                throw new Error(result.error || 'Payment could not be processed. Please check your details and try again.');
-            }
-
-            if (!result.redirect_url) {
-                throw new Error('Payment gateway configuration error. Please contact support.');
-            }
-
-            window.location.href = result.redirect_url;
-        } catch (err) {
-            console.error('Donation submission error:', err);
-            document.getElementById('error-description').innerText = err.message || 'Payment processing failed. Please try again.';
-            switchState('error');
-            isProcessing = false;
-
-            // Log the error to a monitoring service if available
-            if (typeof logError === 'function') {
-                logError(err);
-            }
-        }
+        attemptPayment();
     }
 
     // Listeners
