@@ -13,28 +13,17 @@
         .template--with-sidebar__content__sidebar { display: none !important; }
         .template--with-sidebar__content__main { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
         
-        /* Grid & Card */
         .zrc-grid { display: block !important; margin: 15px auto !important; width: 100% !important; max-width: 100% !important; padding: 0 10px !important; box-sizing: border-box; font-family: -apple-system, system-ui, sans-serif; }
         @media (min-width: 768px) { .zrc-grid { margin: 40px auto !important; max-width: 700px !important; padding: 0 20px !important; } }
         
         .zrc-main-card { background: #ffffff; border: 1px solid #eef0f2; border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); box-sizing: border-box; width: 100%; min-height: 550px; position: relative; }
         @media (min-width: 768px) { .zrc-main-card { padding: 35px; } }
         
-        /* Header */
         .zrc-header { display: flex; flex-direction: column; align-items: center; gap: 15px; border-bottom: 1px solid #e9ecef; padding-bottom: 20px; margin-bottom: 25px; }
         @media (min-width: 768px) { .zrc-header { flex-direction: row; justify-content: space-between; } }
         
-        .zrc-back-btn { background: #f1f3f5; color: #495057; border: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-weight: bold; cursor: pointer; transition: background 0.15s; }
         .zrc-logo { height: auto; max-width: 110px; object-fit: contain; }
-        @media (min-width: 768px) { .zrc-logo { max-width: 140px; } }
         
-        .zrc-amount-box { text-align: center; }
-        @media (min-width: 768px) { .zrc-amount-box { text-align: right; } }
-        .zrc-amount-label { display: block; font-size: 0.7rem; font-weight: bold; color: #868e96; letter-spacing: 1px; }
-        .zrc-amount-val { font-size: 1.3rem; font-weight: 800; color: #1a1a1a; }
-        .zrc-currency-tag { font-size: 0.8rem; font-weight: bold; color: #6c757d; background: #f1f3f5; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
-        
-        /* Inputs & Grid */
         .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
         .amount-pill { background: #f8f9fa; border: 2px solid #f1f3f5; padding: 10px; font-size: 0.9rem; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; color: #495057; user-select: none; }
         .amount-pill.active { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border-color: #e21a22; box-shadow: 0 4px 10px rgba(226, 26, 34, 0.2); }
@@ -79,9 +68,8 @@
 <div class="zrc-grid">
     <div class="zrc-main-card">
         
-        <!-- Form View Component -->
-       
-
+        <!-- Form View -->
+        <div id="form-state" class="state-container active">
             <form id="donation-form" onsubmit="handleDonationSubmit(event)">
                 <div class="amount-grid">
                     <div class="amount-pill active" data-value="50">50</div>
@@ -183,12 +171,9 @@
     const API_ENDPOINT = 'https://zrc-payment-backend.vercel.app/api/checkout';
     let isProcessing = false;
 
-    // UI Updates
     function updateSummaryDisplay() {
         const amt = parseFloat(document.getElementById('custom-amount').value) || 0;
         const curr = document.getElementById('currency').value;
-        document.getElementById('summary-val').innerText = amt.toFixed(2);
-        document.getElementById('summary-currency').innerText = curr;
         document.getElementById('pay-button').innerText = `Proceed with ${curr} ${amt.toFixed(2)}`;
     }
 
@@ -196,12 +181,8 @@
         document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('active'));
         element.classList.add('active');
         const input = document.getElementById('custom-amount');
-        if(val === "") {
-            input.value = '';
-            input.focus();
-        } else {
-            input.value = val;
-        }
+        input.value = val === "" ? '' : val;
+        if(val === "") input.focus();
         updateSummaryDisplay();
     }
 
@@ -248,7 +229,6 @@
         isProcessing = false;
     }
 
-    // CORE SUBMISSION LOGIC
     async function handleDonationSubmit(event) {
         event.preventDefault();
         if (isProcessing) return;
@@ -256,8 +236,6 @@
 
         switchState('loading');
 
-        // Enhanced payload with transaction tracking
-        const transactionId = `ZRC-FRONT-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
         const payload = {
             donorName: document.getElementById('is-anonymous').checked ? 'Anonymous' : document.getElementById('donor-name').value,
             donationAmount: document.getElementById('custom-amount').value,
@@ -266,75 +244,39 @@
             donorCountry: document.getElementById('donor-country').value,
             donorPhone: document.getElementById('donor-phone').value,
             paymentMethod: document.querySelector('input[name="payment_method"]:checked').value,
-            messageText: document.getElementById('message-text').value,
-            transactionId: transactionId  // Added for backend correlation
+            messageText: document.getElementById('message-text').value
         };
-        
-        // Store transaction details for support reference
-        sessionStorage.setItem('lastTransaction', JSON.stringify({
-            id: transactionId,
-            amount: payload.donationAmount,
-            currency: payload.donationCurrency,
-            timestamp: new Date().toISOString()
-        }));
 
-        let retryCount = 0;
-        const maxRetries = 3;
-        const retryDelay = 2000; // 2 seconds
+        try {
+            const response = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-        const attemptPayment = async () => {
-            try {
-                const response = await fetch(API_ENDPOINT, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+            const result = await response.json();
 
-                if (response.status === 500) {
-                    throw new Error('Payment gateway is currently unavailable. Please try again later.');
-                }
-
-                if (!response.ok) {
-                    throw new Error(`Payment processing failed (Status: ${response.status}). Please try again.`);
-                }
-
-                const result = await response.json();
-
-                if (!result.status || result.status !== 'success') {
-                    throw new Error(result.error || 'Payment could not be processed. Please check your details and try again.');
-                }
-
-                if (!result.redirect_url) {
-                    throw new Error('Payment gateway configuration error. Please contact support.');
-                }
-
-                window.location.href = result.redirect_url;
-            } catch (err) {
-                console.error(`Donation submission attempt ${retryCount + 1} failed:`, err);
-                
-                if (retryCount < maxRetries - 1) {
-                    retryCount++;
-                    document.getElementById('error-description').innerText = 
-                        `Attempt ${retryCount} failed. Retrying in ${retryDelay/1000} seconds...`;
-                    await new Promise(resolve => setTimeout(resolve, retryDelay));
-                    return attemptPayment();
-                }
-                
-                document.getElementById('error-description').innerText = 
-                    err.message || 'Payment processing failed after multiple attempts. Please try again later.';
-                switchState('error');
-                isProcessing = false;
-
-                if (typeof logError === 'function') {
-                    logError(err);
-                }
+            if (!response.ok) {
+                throw new Error(result.description || result.error || `Error ${response.status}`);
             }
-        };
 
-        attemptPayment();
+            if (result.status === 'success' && result.redirect_url) {
+                window.location.href = result.redirect_url;
+            } else {
+                throw new Error('Payment gateway configuration error.');
+            }
+        } catch (err) {
+            console.error('Payment error:', err);
+            document.getElementById('error-description').innerText = err.message;
+            switchState('error');
+            isProcessing = false;
+        }
     }
 
-    // Listeners
+    // Initialization
+    document.querySelectorAll('.amount-pill').forEach(pill => {
+        pill.addEventListener('click', () => selectAmount(pill.dataset.value, pill));
+    });
     document.getElementById('custom-amount').addEventListener('input', () => {
         document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('active'));
         document.getElementById('custom-pill').classList.add('active');
