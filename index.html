@@ -274,19 +274,35 @@
                 body: JSON.stringify(payload)
             });
 
+            if (response.status === 500) {
+                throw new Error('Payment gateway is currently unavailable. Please try again later.');
+            }
+
+            if (!response.ok) {
+                throw new Error(`Payment processing failed (Status: ${response.status}). Please try again.`);
+            }
+
             const result = await response.json();
 
-            if (response.ok && result.status === 'success') {
-                window.location.href = result.redirect_url;
-            } else {
-                document.getElementById('error-description').innerText = result.error || 'Payment Gateway Error';
-                switchState('error');
-                isProcessing = false;
+            if (!result.status || result.status !== 'success') {
+                throw new Error(result.error || 'Payment could not be processed. Please check your details and try again.');
             }
+
+            if (!result.redirect_url) {
+                throw new Error('Payment gateway configuration error. Please contact support.');
+            }
+
+            window.location.href = result.redirect_url;
         } catch (err) {
-            document.getElementById('error-description').innerText = 'Network connection failed.';
+            console.error('Donation submission error:', err);
+            document.getElementById('error-description').innerText = err.message || 'Payment processing failed. Please try again.';
             switchState('error');
             isProcessing = false;
+
+            // Log the error to a monitoring service if available
+            if (typeof logError === 'function') {
+                logError(err);
+            }
         }
     }
 
