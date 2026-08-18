@@ -1,490 +1,466 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZRC Donation Form</title>
-    <style>
-        /* 
-         * Scoped styles for the ZRC Donation Widget. 
-         * By prefixing all rules with #zrc-donation-widget, we increase specificity
-         * and avoid conflicts with host website styles, removing the need for !important.
-        */
-        #zrc-donation-widget {
-            display: block;
-            margin: 15px auto;
-            width: 100%;
-            max-width: 100%;
-            padding: 0 10px;
-            box-sizing: border-box;
-            font-family: -apple-system, system-ui, sans-serif;
-        }
-        @media (min-width: 768px) {
-            #zrc-donation-widget {
-                margin: 40px auto;
-                max-width: 700px;
-                padding: 0 20px;
-            }
-        }
-        
-        #zrc-donation-widget .zrc-main-card { background: #ffffff; border: 1px solid #eef0f2; border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); box-sizing: border-box; width: 100%; min-height: 550px; position: relative; }
-        @media (min-width: 768px) { #zrc-donation-widget .zrc-main-card { padding: 35px; } }
-        
-        /* Header */
-        #zrc-donation-widget .zrc-header { display: flex; flex-direction: column; align-items: center; gap: 15px; border-bottom: 1px solid #e9ecef; padding-bottom: 20px; margin-bottom: 25px; }
-        @media (min-width: 768px) { #zrc-donation-widget .zrc-header { flex-direction: row; justify-content: space-between; } }
-        
-        #zrc-donation-widget .zrc-back-btn { background: #f1f3f5; color: #495057; border: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-weight: bold; cursor: pointer; transition: background 0.15s; }
-        #zrc-donation-widget .zrc-logo { height: auto; max-width: 110px; object-fit: contain; }
-        @media (min-width: 768px) { #zrc-donation-widget .zrc-logo { max-width: 140px; } }
-        
-        #zrc-donation-widget .zrc-amount-box { text-align: center; }
-        @media (min-width: 768px) { #zrc-donation-widget .zrc-amount-box { text-align: right; } }
-        #zrc-donation-widget .zrc-amount-label { display: block; font-size: 0.7rem; font-weight: bold; color: #868e96; letter-spacing: 1px; }
-        #zrc-donation-widget .zrc-amount-val { font-size: 1.3rem; font-weight: 800; color: #1a1a1a; }
-        #zrc-donation-widget .zrc-currency-tag { font-size: 0.8rem; font-weight: bold; color: #6c757d; background: #f1f3f5; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
-        
-        /* Inputs & Grid */
-        #zrc-donation-widget .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        #zrc-donation-widget .amount-pill { background: #f8f9fa; border: 2px solid #f1f3f5; padding: 10px; font-size: 0.9rem; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; color: #495057; user-select: none; }
-        #zrc-donation-widget .amount-pill.active { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border-color: #e21a22; box-shadow: 0 4px 10px rgba(226, 26, 34, 0.2); }
-        
-        #zrc-donation-widget .custom-amount-wrapper { position: relative; margin-bottom: 15px; }
-        #zrc-donation-widget .custom-amount-input { width: 100%; padding: 12px; font-size: 1.15rem; font-weight: bold; border: 2px solid #e9ecef; border-radius: 8px; box-sizing: border-box; padding-right: 110px; color: #212529; }
-        #zrc-donation-widget .currency-select { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: #f1f3f5; font-weight: bold; padding: 10px 12px; border-radius: 6px; cursor: pointer; }
-        
-        #zrc-donation-widget .form-group { margin-bottom: 18px; text-align: left; }
-        #zrc-donation-widget .form-label { display: block; font-size: 0.9rem; font-weight: bold; color: #495057; margin-bottom: 6px; }
-        #zrc-donation-widget .form-text-input, #zrc-donation-widget .form-select-input { width: 100%; padding: 10px 12px; border: 2px solid #e9ecef; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; color: #333; transition: border 0.3s; background: #fff; }
-        #zrc-donation-widget .form-text-input:focus, #zrc-donation-widget .form-select-input:focus { border-color: #e21a22; outline: none; }
+<style>
+  main, .layout-content, .region-content, .block-system-main-block, article, .node, .node__content, .field--name-body, .content, .clearfix { display: block !important; width: 100% !important; max-width: 1140px !important; margin-left: auto !important; margin-right: auto !important; padding-left: 24px !important; padding-right: 24px !important; box-sizing: border-box !important; }
+  .template--with-sidebar__content { display: block !important; width: 100% !important; max-width: 1140px !important; margin-left: auto !important; margin-right: auto !important; padding-left: 24px !important; padding-right: 24px !important; box-sizing: border-box !important; }
+  .template--with-sidebar__content__sidebar { display: none !important; }
+  .template--with-sidebar__content__main { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
+  
+  .zrc-grid { display: block !important; margin: 15px auto !important; width: 100% !important; max-width: 100% !important; padding-left: 10px !important; padding-right: 10px !important; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  @media (min-width: 768px) { .zrc-grid { margin: 40px auto !important; max-width: 700px !important; padding-left: 20px !important; padding-right: 20px !important; } }
+  
+  .zrc-main-card { background: #ffffff; border: 1px solid #eef0f2; border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); box-sizing: border-box; width: 100%; min-height: 450px; position: relative; }
+  @media (min-width: 768px) { .zrc-main-card { padding: 35px; min-height: 550px; } }
+  
+  .zrc-header { display: flex; flex-direction: column; align-items: center; gap: 15px; border-bottom: 1px solid #e9ecef; padding-bottom: 20px; margin-bottom: 25px; }
+  @media (min-width: 768px) { .zrc-header { flex-direction: row; justify-content: space-between; gap: 20px; } }
+  
+  .zrc-header-methods { display: flex; gap: 8px; background: #f1f3f5; padding: 4px; border-radius: 30px; align-items: center; overflow-x: auto; max-width: 100%; box-sizing: border-box; scrollbar-width: none; -ms-overflow-style: none; }
+  .zrc-header-methods::-webkit-scrollbar { display: none; }
+  
+  .zrc-header .zrc-tab { background: transparent; border: none; border-radius: 20px; padding: 8px 16px; margin: 0; display: inline-flex; align-items: center; font-weight: bold; font-size: 0.82rem; color: #495057; cursor: not-allowed; transition: all 0.2s ease; opacity: 0.35; pointer-events: none; text-decoration: none; white-space: nowrap; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
+  @media (min-width: 768px) { .zrc-header .zrc-tab { font-size: 0.85rem; } }
+  .zrc-header-methods.step-2-enabled .zrc-tab { opacity: 0.7; cursor: pointer; pointer-events: auto !important; }
+  .zrc-header-methods.step-2-enabled .zrc-tab:hover { background: #dee2e6; color: #212529; opacity: 1; }
+  .zrc-header-methods.step-2-enabled .zrc-tab.active { background: #e21a22; color: #ffffff; opacity: 1; }
+  
+  .zrc-back-btn { background: #f1f3f5; color: #495057; border: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: background 0.15s; }
+  .zrc-back-btn:hover { background: #dee2e6; }
+  .zrc-logo { height: auto; width: auto; max-width: 110px; object-fit: contain; }
+  @media (min-width: 768px) { .zrc-logo { max-width: 140px; } }
+  
+  .zrc-amount-box { text-align: center; width: 100%; }
+  @media (min-width: 768px) { .zrc-amount-box { text-align: right; width: auto; } }
+  
+  .zrc-amount-label { display: block; font-size: 0.7rem; font-weight: bold; color: #868e96; letter-spacing: 1px; margin-bottom: 2px; }
+  .zrc-amount-val { font-size: 1.3rem; font-weight: 800; color: #1a1a1a; }
+  .zrc-currency-tag { font-size: 0.8rem; font-weight: bold; color: #6c757d; background: #f1f3f5; padding: 2px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+  
+  .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+  @media (min-width: 768px) { .amount-grid { gap: 12px; } }
+  
+  .amount-pill { background: #f8f9fa; border: 2px solid #f1f3f5; padding: 10px; font-size: 0.9rem; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; color: #495057; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
+  @media (min-width: 768px) { .amount-pill { padding: 14px; font-size: 1rem; } }
+  .amount-pill:hover, .amount-pill.active { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border-color: #e21a22; box-shadow: 0 4px 10px rgba(226, 26, 34, 0.2); }
+  
+  .custom-amount-wrapper { position: relative; margin-bottom: 15px; }
+  .custom-amount-input { width: 100%; padding: 12px; font-size: 1.15rem; font-weight: bold; border: 2px solid #e9ecef; border-radius: 8px; box-sizing: border-box; padding-right: 110px; color: #212529; transition: all 0.3s ease; }
+  @media (min-width: 768px) { .custom-amount-input { padding: 16px; font-size: 1.3rem; } }
+  .custom-amount-input:focus { border-color: #e21a22; box-shadow: 0 0 10px rgba(226, 26, 34, 0.25); outline: none; }
+  .currency-select { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background-color: #f1f3f5; font-weight: bold; font-size: 1rem; color: #495057; padding: 10px 12px; border-radius: 6px; cursor: pointer; outline: none; }
+  
+  .form-group { margin-bottom: 18px; text-align: left; }
+  .form-label { display: block; font-size: 0.9rem; font-weight: bold; color: #495057; margin-bottom: 6px; }
+  .form-text-input { width: 100%; padding: 10px 12px; border: 2px solid #e9ecef; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; color: #333; transition: all 0.3s ease; }
+  @media (min-width: 768px) { .form-text-input { padding: 12px 14px; font-size: 1rem; } }
+  .form-text-input:focus { border-color: #e21a22; box-shadow: 0 0 10px rgba(226, 26, 34, 0.25); outline: none; }
+  
+  .inline-checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+  .inline-checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+  .inline-checkbox-group label { font-size: 0.9rem; font-weight: bold; color: #495057; margin: 0; cursor: pointer; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
+  
+  .submit-donation-btn { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 1.05rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(226, 26, 34, 0.3); transition: all 0.3s ease; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
+  @media (min-width: 768px) { .submit-donation-btn { padding: 18px; font-size: 1.15rem; } }
+  .submit-donation-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(226, 26, 34, 0.45); }
+  .submit-donation-btn:disabled { background: #ccc !important; cursor: not-allowed !important; transform: none !important; box-shadow: none !important; }
+  
+  .bank-details-box { background: #fff8f8; border: 1px dashed #e21a22; border-radius: 8px; padding: 15px; margin-bottom: 18px; text-align: left; }
+  .bank-detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; color: #495057; }
+  
+  .state-container { display: none; position: relative; width: 100%; min-height: 350px; }
+  .state-container.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+  .state-loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 15px; color: #868e96; font-weight: bold; text-align: center; width: 100%; }
+  .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #e21a22; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  @media (max-width: 767px) {
+    .zrc-grid { display: block !important; width: 100% !important; max-width: 100% !important; padding-left: 10px !important; padding-right: 10px !important; margin: 10px 0 !important; }
+    .zrc-main-card { padding: 15px !important; min-height: auto !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; }
+    .template--with-sidebar__content, .template--with-sidebar__content__main, main, .layout-content, .region-content, .block-system-main-block, article, .node, .node__content, .field--name-body, .content, .clearfix { width: 100% !important; max-width: 100% !important; padding-left: 10px !important; padding-right: 10px !important; margin-left: 0 !important; margin-right: 0 !important; display: block !important; box-sizing: border-box !important; }
+  }
+  @media (min-width: 768px) {
+    .zrc-grid { gap: 40px; margin: 40px auto !important; padding-left: 20px !important; padding-right: 20px !important; }
+    .zrc-main-card { padding: 35px; min-height: 550px; }
+  }
+  @media (max-width: 600px) {
+    .zrc-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .zrc-amount-box { text-align: left; width: 100%; }
+    .zrc-logo { max-width: 120px; }
+    .amount-grid { gap: 8px; }
+    .amount-pill { padding: 10px; font-size: 0.9rem; }
+  }
+</style>
 
-        #zrc-donation-widget .payment-method-selector { display: flex; gap: 15px; margin-top: 5px; }
-        #zrc-donation-widget .method-option { flex: 1; position: relative; }
-        #zrc-donation-widget .method-option input { position: absolute; opacity: 0; cursor: pointer; }
-        #zrc-donation-widget .method-label { display: block; text-align: center; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; font-weight: bold; color: #495057; cursor: pointer; transition: all 0.2s; }
-        #zrc-donation-widget .method-option input:checked + .method-label { background: #f8f9fa; border-color: #e21a22; color: #e21a22; }
-
-        #zrc-donation-widget .inline-checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
-        #zrc-donation-widget .inline-checkbox-group input { width: 18px; height: 18px; cursor: pointer; }
-        #zrc-donation-widget .inline-checkbox-group label { font-size: 0.9rem; font-weight: bold; color: #495057; cursor: pointer; }
-        
-        #zrc-donation-widget .submit-donation-btn { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 1.05rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(226, 26, 34, 0.3); transition: all 0.3s; }
-        #zrc-donation-widget .submit-donation-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(226, 26, 34, 0.45); }
-        #zrc-donation-widget .submit-donation-btn:disabled { background: #ccc; cursor: not-allowed; }
-        
-        #zrc-donation-widget .state-container { display: none; }
-        #zrc-donation-widget .state-container.active { display: flex; animation: fadeIn 0.4s ease; }
-        
-        #zrc-donation-widget .state-wrapper-box { position: absolute; inset: 0; background: white; padding: 35px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 10; border-radius: 12px; }
-        #zrc-donation-widget .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #e21a22; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
-        #zrc-donation-widget .state-error { color: #dc3545; }
-        #zrc-donation-widget .retry-btn { background: #e21a22; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-top: 15px; font-weight: bold; }
-
-        /* Validation */
-        #zrc-donation-widget .error-message { color: #e21a22; font-size: 0.8rem; font-weight: bold; margin-top: 4px; display: none; }
-        #zrc-donation-widget .form-text-input.invalid { border-color: #e21a22; }
-
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
-</head>
-<body>
-
-<div id="zrc-donation-widget" class="zrc-grid">
+<div class="zrc-grid">
     <div class="zrc-main-card">
-        
-        <div id="form-view">
-            <header class="zrc-header">
-                <a href="javascript:history.back()" class="zrc-back-btn" aria-label="Go back">‹</a>
-                <img src="https://zambianredcross.org/wp-content/uploads/2022/07/zrcs-PNG-2-1.png" alt="ZRC Logo" class="zrc-logo">
-                <div class="zrc-amount-box">
-                    <span class="zrc-amount-label">YOU ARE DONATING</span>
-                    <span class="zrc-amount-val" id="summary-val">50.00</span>
-                    <span class="zrc-currency-tag" id="summary-currency">ZMW</span>
+        <div class="zrc-header">
+            <p>
+                <a class="zrc-back-btn" href="/donate-1">←</a> <img src="/sites/default/files/inline-images/toll_free_banner_0.png" alt="Toll free line" class="zrc-logo" width="230" height="124">
+            </p>
+            <div class="zrc-header-methods">
+                <div class="zrc-tab active" id="tab-momo" onclick="selectMethod(&apos;momo&apos;, this)">
+                    Mobile Money
                 </div>
-            </header>
-
-            <form id="donation-form">
-                <div class="amount-grid">
-                    <div class="amount-pill active" data-value="50">50</div>
-                    <div class="amount-pill" data-value="100">100</div>
-                    <div class="amount-pill" data-value="250">250</div>
-                    <div class="amount-pill" data-value="500">500</div>
-                    <div class="amount-pill" data-value="1000">1000</div>
-                    <div class="amount-pill" data-value="" id="custom-pill">Custom</div>
+                <div class="zrc-tab" id="tab-card" onclick="selectMethod(&apos;card&apos;, this)">
+                    Card Payment
                 </div>
-
-                <div class="custom-amount-wrapper">
-                    <input type="number" id="custom-amount" class="custom-amount-input" value="50" min="1" step="any">
-                    <select id="currency" class="currency-select">
-                        <option value="ZMW">ZMW</option>
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
-                        <option value="GBP">GBP</option>
-                    </select>
+                <div class="zrc-tab" id="tab-bank" onclick="selectMethod(&apos;bank&apos;, this)">
+                    Bank Transfer
                 </div>
-
+            </div>
+            <div class="zrc-amount-box">
+                <span class="zrc-amount-label">DONATION AMOUNT</span> <span class="zrc-amount-val" id="header-amount-val">50.00</span> <span class="zrc-currency-tag" id="header-currency-tag">ZMW</span>
+            </div>
+        </div>
+        <div id="step-1-state">
+            <div class="amount-grid">
+                <div class="amount-pill active" onclick="selectAmount(50, this)">
+                    50
+                </div>
+                <div class="amount-pill" onclick="selectAmount(100, this)">
+                    100
+                </div>
+                <div class="amount-pill" onclick="selectAmount(250, this)">
+                    250
+                </div>
+                <div class="amount-pill" onclick="selectAmount(500, this)">
+                    500
+                </div>
+                <div class="amount-pill" onclick="selectAmount(1000, this)">
+                    1000
+                </div>
+                <div class="amount-pill" onclick="selectAmount(&apos;&apos;, this, true)">
+                    Custom
+                </div>
+            </div>
+            <div class="custom-amount-wrapper">
+                <input class="custom-amount-input" type="number" id="donation-amount" value="50" oninput="updateAmountDisplay()"> <select class="currency-select" id="currency-picker" onchange="updateAmountDisplay()">
+                                                                                                    <option value="ZMW" selected="">ZMW</option>
+                                                                                                    <option value="USD">USD</option>
+                                                                                                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Your Name</label> <input class="form-text-input" type="text" id="donor-name" placeholder="Enter your name">
+            </div>
+            <div class="inline-checkbox-group">
+                <input type="checkbox" id="is-anonymous" onchange="toggleAnonymous()"> <label for="is-anonymous">Make this donation anonymous</label>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Add Comment / Message (Optional)</label> <textarea class="form-text-input" style="min-height:60px;resize:vertical;" id="donor-message"></textarea>
+            </div>
+            <p>
+                <button class="submit-donation-btn" id="next-button" onclick="goToStepTwo(); document.querySelector(&apos;.zrc-header-methods&apos;).classList.add(&apos;step-2-enabled&apos;);">Next: Choose Payment</button>
+            </p>
+        </div>
+        <div style="display:none;" id="step-2-state">
+            <!-- GLOBAL PHONE INPUT (Visible for both Momo & Card) -->
+            <div class="form-group">
+                <label class="form-label">Mobile Number (Required for receipt & verification)</label> 
+                <input class="form-text-input" type="tel" id="momo-number" placeholder="e.g. 057XXXXXXXX or 097XXXXXXXX">
+            </div>
+            
+            <div id="momo-fields-container">
                 <div class="form-group">
-                    <label class="form-label">Payment Method</label>
-                    <div class="payment-method-selector">
-                        <label class="method-option">
-                            <input type="radio" name="payment_method" value="mobile_money" checked>
-                            <span class="method-label">Mobile Money</span>
-                        </label>
-                        <label class="method-option">
-                            <input type="radio" name="payment_method" value="card">
-                            <span class="method-label">Card</span>
-                        </label>
+                    <label class="form-label">Select Mobile Network</label> <select class="form-text-input" id="momo-network">
+                                                                                                                            <option value="mtn">MTN Zambia</option>
+                                                                                                                            <option value="airtel">Airtel Zambia</option>
+                                                                                                                            <option value="zamtel">Zamtel Zambia</option>
+                                                                                                                        </select>
+                </div>
+            </div>
+            <div style="display:none;" id="card-fields-container">
+                <div class="secure-redirect-notice">
+                    <p>
+                        <strong>Secure Checkout:</strong> Card processing occurs on Tingg's encrypted server. You will be redirected after clicking Pay.
+                    </p>
+                </div>
+            </div>
+            <div style="display:none;" id="bank-fields-container">
+                <div class="bank-details-box">
+                    <h4 style="color:#e21a22;font-size:0.85rem;margin:0 0 10px 0;">
+                        <strong>Zambia Red Cross Society Account:</strong>
+                    </h4>
+                    <div class="bank-detail-row">
+                        <strong>Bank Name:</strong> <span>Standard Chartered</span>
+                    </div>
+                    <div class="bank-detail-row">
+                        <strong>Account Name:</strong> <span>Zambia Red Cross Society</span>
+                    </div>
+                    <div class="bank-detail-row">
+                        <strong>Account Number:</strong> <span>01001100XXXXX</span>
+                    </div>
+                    <div class="bank-detail-row">
+                        <strong>Branch:</strong> <span>Lusaka Main Branch</span>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" id="donor-name" class="form-text-input" placeholder="John Doe" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" id="donor-email" class="form-text-input" placeholder="johndoe@example.com" required>
-                    <div class="error-message" id="email-error"></div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" id="phone-label">Mobile Phone Number <span style="color:red">*</span></label>
-                    <input type="tel" id="donor-phone" class="form-text-input" placeholder="e.g. 0971234567" required>
-                    <div class="error-message" id="phone-error"></div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Billing Country</label>
-                    <select id="donor-country" class="form-select-input">
-                        <!-- Options will be populated by JS -->
-                        <option value="ZM" selected>Zambia (ZM)</option>
-                        <option value="KE">Kenya (KE)</option>
-                        <option value="TZ">Tanzania (TZ)</option>
-                        <option value="UG">Uganda (UG)</option>
-                        <option value="ZA">South Africa (ZA)</option>
-                        <option value="US">United States (US)</option>
-                        <option value="GB">United Kingdom (GB)</option>
-                    </select>
-                </div>
-
-                <div class="inline-checkbox-group">
-                    <input type="checkbox" id="is-anonymous">
-                    <label for="is-anonymous">Make this donation anonymous</label>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Message (Optional)</label>
-                    <textarea id="message-text" class="form-text-input" style="min-height:60px;resize:none;"></textarea>
-                </div>
-
-                <button type="submit" class="submit-donation-btn" id="pay-button">Proceed with ZMW 50.00</button>
-            </form>
-        </div>
-
-        <!-- Loading State -->
-        <div id="loading-state" class="state-container">
-            <div class="state-wrapper-box">
-                <div class="spinner"></div>
-                <p>Preparing secure payment portal...</p>
+            </div>
+            <p>
+                <button class="submit-donation-btn" id="pay-button" onclick="recordAndSubmit()">Pay ZMW 50.00</button>
+            </p>
+            <div style="margin-top:15px;text-align:center;">
+                <a class="modal-cancel-btn" onclick="returnToStepOne(); document.querySelector(&apos;.zrc-header-methods&apos;).classList.remove(&apos;step-2-enabled&apos;);">← Edit Details</a>
             </div>
         </div>
-
-        <!-- Error State -->
-        <div id="error-state" class="state-container">
-            <div class="state-wrapper-box state-error">
-                <div style="font-size:3rem;">⚠️</div>
-                <h3>Payment Failed</h3>
-                <p id="error-description"></p>
-                <button class="retry-btn" onclick="resetForm()">Try Again</button>
+        <div class="state-container" id="iframe-state">
+            <div class="state-loader" id="loader-view">
+                <div class="spinner">
+                    &nbsp;
+                </div>
+                <p id="loading-text">
+                    Processing transaction...
+                </p>
+            </div>
+            <div class="state-loader" style="display:none;" id="success-view">
+                <h3 style="color:#25a75c;">
+                    Thank You!
+                </h3>
+                <p id="success-message">
+                    Processing...
+                </p>
+                <p>
+                    <button class="submit-donation-btn" style="background-color:#25a75c;margin-top:30px;" onclick="location.reload()">Make Another Donation</button>
+                </p>
             </div>
         </div>
-
     </div>
 </div>
-
 <script>
-    const API_ENDPOINT = 'https://zrc-payment-backend.vercel.app/api/checkout';
-    
-    // --- DOM Element References ---
-    const ui = {
-        formView: document.getElementById('form-view'),
-        loadingState: document.getElementById('loading-state'),
-        errorState: document.getElementById('error-state'),
-        errorDescription: document.getElementById('error-description'),
-        payButton: document.getElementById('pay-button'),
-        summaryVal: document.getElementById('summary-val'),
-        summaryCurrency: document.getElementById('summary-currency'),
-        emailInput: document.getElementById('donor-email'),
-        phoneInput: document.getElementById('donor-phone'),
-        countrySelect: document.getElementById('donor-country'),
-        emailError: document.getElementById('email-error'),
-        phoneError: document.getElementById('phone-error'),
-        phoneLabel: document.getElementById('phone-label'),
-        nameInput: document.getElementById('donor-name'),
-        anonymousCheckbox: document.getElementById('is-anonymous'),
-        messageText: document.getElementById('message-text'),
-    };
-
-    const donationForm = document.getElementById('donation-form');
-    const customAmountInput = document.getElementById('custom-amount');
-    const currencySelect = document.getElementById('currency');
-    const payButton = document.getElementById('pay-button');
-    const amountPills = document.querySelectorAll('.amount-pill');
-    const customPill = document.getElementById('custom-pill');
-
-    // --- UI Update Functions ---
-    function updateSummaryDisplay() {
-        const amt = parseFloat(customAmountInput.value) || 0;
-        const curr = currencySelect.value;
-        ui.summaryVal.innerText = amt.toFixed(2);
-        ui.summaryCurrency.innerText = curr;
-        ui.payButton.innerText = `Proceed with ${curr} ${amt.toFixed(2)}`;
+  (function() {
+    if (!document.querySelector('meta[name="viewport"]')) {
+      var meta = document.createElement('meta');
+      meta.name = "viewport";
+      meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+      document.getElementsByTagName('head')[0].appendChild(meta);
     }
-
-    function selectAmount(val, element) {
-        document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('active'));
-        element?.classList.add('active'); // Use optional chaining in case element is null
-        
-        if(val === "") {
-            customAmountInput.value = '';
-            customAmountInput.focus();
-        } else {
-            customAmountInput.value = val;
+    function resetParents() {
+      if (window.innerWidth < 768) {
+        var grid = document.querySelector('.zrc-grid');
+        if (grid) {
+          var parent = grid.parentElement;
+          while (parent && parent.tagName !== 'BODY') {
+            parent.style.setProperty('width', '100%', 'important');
+            parent.style.setProperty('max-width', '100%', 'important');
+            parent.style.setProperty('padding-left', '0px', 'important');
+            parent.style.setProperty('padding-right', '0px', 'important');
+            parent.style.setProperty('margin-left', '0px', 'important');
+            parent.style.setProperty('margin-right', '0px', 'important');
+            parent.style.setProperty('display', 'block', 'important');
+            parent = parent.parentElement;
+          }
         }
-        updateSummaryDisplay();
+      }
     }
-
-    function handleMethodChange() {
-        const method = document.querySelector('input[name="payment_method"]:checked').value;
-        if (method === 'card') {
-            ui.phoneLabel.innerHTML = 'Mobile Phone Number (Optional)';
-            ui.phoneInput.required = false;
-        } else {
-            ui.phoneLabel.innerHTML = 'Mobile Phone Number <span style="color:red">*</span>';
-            ui.phoneInput.required = true;
-        }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', resetParents);
+    } else {
+      resetParents();
     }
-
-    function toggleCountryRules() {
-        const country = ui.countrySelect.value;
-        if (country === 'ZM') {
-            ui.phoneLabel.innerHTML = 'Mobile Phone Number <span style="color:red">*</span>';
-            ui.phoneInput.placeholder = "e.g. 0971234567";
-        } else {
-            ui.phoneLabel.innerHTML = 'Mobile Phone Number (Include Country Code)';
-            ui.phoneInput.placeholder = "e.g. 254712345678";
-        }
-    }
-
-    function toggleAnonymous() {
-        const isAnon = ui.anonymousCheckbox.checked;
-        ui.nameInput.value = isAnon ? 'Anonymous' : '';
-        ui.nameInput.disabled = isAnon;
-    }
-
-    // --- State Management ---
-    const appState = {
-        _state: 'FORM', // 'FORM', 'LOADING', 'ERROR'
-        isProcessing: false,
-        errorMessage: '',
-
-        setState(newState, options = {}) {
-            this._state = newState;
-            this.isProcessing = (newState === 'LOADING');
-            if (newState === 'ERROR') {
-                this.errorMessage = options.message || 'An unknown error occurred.';
-            }
-            this.render();
-        },
-
-        render() {
-            ui.formView.style.display = 'none';
-            ui.loadingState.classList.remove('active');
-            ui.errorState.classList.remove('active');
-            ui.payButton.disabled = this.isProcessing;
-
-            switch (this._state) {
-                case 'LOADING':
-                    ui.loadingState.classList.add('active');
-                    break;
-                case 'ERROR':
-                    ui.errorDescription.innerText = this.errorMessage;
-                    ui.errorState.classList.add('active');
-                    break;
-                case 'FORM':
-                default:
-                    ui.formView.style.display = 'block';
-                    break;
-            }
-        }
-    };
-
-    function resetForm() {
-        appState.setState('FORM');
-    }
-
-    // --- Validation Logic ---
-    function validateForm() {
-        let isValid = true;
-        const country = ui.countrySelect.value;
-
-        // Reset previous errors
-        ui.emailInput.classList.remove('invalid');
-        ui.phoneInput.classList.remove('invalid');
-        ui.emailError.style.display = 'none';
-        ui.phoneError.style.display = 'none';
-
-        // Email validation (simple regex)
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(ui.emailInput.value)) {
-            ui.emailError.textContent = 'Please enter a valid email address.';
-            ui.emailError.style.display = 'block';
-            ui.emailInput.classList.add('invalid');
-            isValid = false;
-        }
-
-        // Phone validation (only if required)
-        if (ui.phoneInput.required && ui.phoneInput.value) {
-            const zambianPhoneRegex = /^0[7-9][0-9]{8}$/; // e.g., 0971234567
-            const internationalPhoneRegex = /^[1-9][0-9]{7,14}$/; // Country code (no +) then number
-
-            const isZambianFormat = country === 'ZM' && zambianPhoneRegex.test(ui.phoneInput.value);
-            const isInternationalFormat = country !== 'ZM' && internationalPhoneRegex.test(ui.phoneInput.value);
-
-            if (!isZambianFormat && !isInternationalFormat) {
-                ui.phoneError.textContent = country === 'ZM' ? 'Please enter a valid 10-digit Zambian number (e.g., 097...)' : 'Please enter a valid number including country code (e.g., 254...).';
-                ui.phoneError.style.display = 'block';
-                ui.phoneInput.classList.add('invalid');
-                isValid = false;
-            }
-        }
-        return isValid;
-    }
-
-    async function handleDonationSubmit(event) { // CORE SUBMISSION LOGIC
-        event.preventDefault();
-        if (appState.isProcessing) return;
-
-        if (!validateForm()) {
-            return; // Stop submission if validation fails
-        }
-        appState.setState('LOADING');
-
-        // Enhanced payload with transaction tracking
-        const transactionId = `ZRC-FRONT-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-        const payload = {
-            donorName: ui.anonymousCheckbox.checked ? 'Anonymous' : ui.nameInput.value,
-            donationAmount: document.getElementById('custom-amount').value,
-            donationCurrency: document.getElementById('currency').value,
-            donorEmail: ui.emailInput.value,
-            donorCountry: ui.countrySelect.value,
-            donorPhone: ui.phoneInput.value,
-            paymentMethod: document.querySelector('input[name="payment_method"]:checked').value,
-            messageText: ui.messageText.value,
-            transactionId: transactionId  // Added for backend correlation
-        };
-        
-        // Store transaction details for support reference
-        sessionStorage.setItem('lastTransaction', JSON.stringify({
-            id: transactionId,
-            amount: payload.donationAmount,
-            currency: payload.donationCurrency,
-            timestamp: new Date().toISOString()
-        }));
-
-        let retryCount = 0;
-        const maxRetries = 3;
-        const retryDelay = 2000; // 2 seconds
-
-        const attemptPayment = async () => {
-            try {
-                const response = await fetch(API_ENDPOINT, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.status === 500) {
-                    throw new Error('Payment gateway is currently unavailable. Please try again later.');
-                }
-
-                if (!response.ok) {
-                    throw new Error(`Payment processing failed (Status: ${response.status}). Please try again.`);
-                }
-
-                const result = await response.json();
-
-                if (!result.status || result.status !== 'success') {
-                    throw new Error(result.error || 'Payment could not be processed. Please check your details and try again.');
-                }
-
-                if (!result.redirect_url) {
-                    throw new Error('Payment gateway configuration error. Please contact support.');
-                }
-
-                window.location.href = result.redirect_url;
-            } catch (err) {
-                console.error(`Donation submission attempt ${retryCount + 1} failed:`, err);
-                
-                if (retryCount < maxRetries - 1) {
-                    retryCount++;
-                    // We could update a message here, but for now, we just retry.
-                    await new Promise(resolve => setTimeout(resolve, retryDelay));
-                    return attemptPayment();
-                }
-                
-                appState.setState('ERROR', { 
-                    message: err.message || 'Payment processing failed after multiple attempts. Please try again later.' 
-                });
-
-                if (typeof logError === 'function') {
-                    logError(err);
-                }
-            }
-        };
-
-        attemptPayment();
-    }
-
-    // --- Event Listeners Initialization ---
-    function initializeForm() {
-        donationForm.addEventListener('submit', handleDonationSubmit);
-
-        amountPills.forEach(pill => {
-            pill.addEventListener('click', () => {
-                selectAmount(pill.dataset.value, pill);
-            });
-        });
-
-        customAmountInput.addEventListener('input', () => {
-            const matchingPill = Array.from(amountPills).find(p => p.dataset.value === customAmountInput.value);
-            selectAmount(customAmountInput.value, matchingPill || customPill);
-        });
-
-        currencySelect.addEventListener('change', updateSummaryDisplay);
-
-        document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
-            radio.addEventListener('change', handleMethodChange);
-        });
-
-        ui.countrySelect.addEventListener('change', toggleCountryRules);
-        ui.anonymousCheckbox.addEventListener('change', toggleAnonymous);
-
-        // Initial state setup
-        updateSummaryDisplay();
-        appState.render(); // Set initial view
-    }
-    
-    // Add real-time validation feedback as user types
-    ui.emailInput.addEventListener('input', validateForm);
-    ui.phoneInput.addEventListener('input', validateForm);
-
-
-    document.addEventListener('DOMContentLoaded', initializeForm);
+    window.addEventListener('resize', resetParents);
+  })();
 </script>
+<script>
+  let selectedMethod = 'momo';
+  let isProcessing = false;
+  let pollingInterval;
+  
+  const API_ENDPOINT = 'https://zrc-payment-backend.vercel.app/api/checkout';
+  const STATUS_ENDPOINT = 'https://zrc-payment-backend.vercel.app/api/status';
+  const SUCCESS_PAGE_URL = "https://www.redcross.org.zm/donation-success";
 
-</body>
-</html>
+  function selectAmount(val, element, isCustom = false) {
+    document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('active'));
+    if (element) element.classList.add('active');
+    const input = document.getElementById('donation-amount');
+    if (isCustom) { input.value = ''; input.focus(); } else { input.value = val; }
+    updateAmountDisplay();
+  }
+
+  function toggleAnonymous() {
+    const anon = document.getElementById('is-anonymous');
+    const nameInput = document.getElementById('donor-name');
+    if (nameInput) {
+      nameInput.value = anon.checked ? 'Anonymous' : '';
+      nameInput.disabled = anon.checked;
+    }
+  }
+
+  function updateAmountDisplay() {
+    const amountInput = document.getElementById('donation-amount');
+    const currencyPicker = document.getElementById('currency-picker');
+    const amount = amountInput ? amountInput.value || '0.00' : '0.00';
+    const currency = currencyPicker ? currencyPicker.value : 'ZMW';
+    
+    document.getElementById('header-amount-val').innerText = parseFloat(amount).toFixed(2);
+    document.getElementById('header-currency-tag').innerText = currency;
+    
+    const payBtn = document.getElementById('pay-button');
+    if (payBtn) payBtn.innerText = `Pay ${currency} ${parseFloat(amount).toFixed(2)}`;
+    
+    const tabs = document.querySelectorAll('.zrc-tab');
+    if (parseFloat(amount) > 0) {
+      tabs.forEach(t => t.classList.add('enabled'));
+    } else {
+      tabs.forEach(t => t.classList.remove('enabled'));
+    }
+  }
+
+  function goToStepTwo() {
+    const amount = document.getElementById('donation-amount').value;
+    if (!amount || parseFloat(amount) <= 0) { alert("Please enter a valid amount."); return; }
+    document.getElementById('step-1-state').style.display = 'none';
+    document.getElementById('step-2-state').style.display = 'block';
+  }
+
+  function returnToStepOne() {
+    if (pollingInterval) clearInterval(pollingInterval);
+    document.getElementById('step-2-state').style.display = 'none';
+    document.getElementById('step-1-state').style.display = 'block';
+  }
+
+  function selectMethod(type, element) {
+    selectedMethod = type;
+    document.querySelectorAll('.zrc-tab').forEach(t => t.classList.remove('active'));
+    element.classList.add('active');
+    document.getElementById('momo-fields-container').style.display = (type === 'momo') ? 'block' : 'none';
+    document.getElementById('card-fields-container').style.display = (type === 'card') ? 'block' : 'none';
+    document.getElementById('bank-fields-container').style.display = (type === 'bank') ? 'block' : 'none';
+  }
+
+  function startStatusPolling(merchantTxnId) {
+    let attempts = 0;
+    const maxAttempts = 30;
+    
+    const amount = document.getElementById('donation-amount').value;
+    const currency = document.getElementById('currency-picker').value;
+    
+    console.log(`[POLLING STARTED] Monitoring transaction: ${merchantTxnId}`);
+
+    pollingInterval = setInterval(async () => {
+      attempts++;
+      console.log(`[POLLING] Attempt ${attempts}/${maxAttempts} checking status...`);
+
+      if (attempts > maxAttempts) {
+        clearInterval(pollingInterval);
+        console.warn("[POLLING TIMEOUT] Verification timed out after 2 minutes.");
+        document.getElementById('success-message').innerHTML = `<strong>Verification Timeout</strong><br>
+        If the money has been deducted from your account but this screen hasn't updated, please check your SMS receipt or contact support.`;
+        return;
+      }
+
+      try {
+        const response = await fetch(`${STATUS_ENDPOINT}?merchant_transaction_id=${merchantTxnId}&amount=${amount}&currency=${currency}&t=${Date.now()}`);
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`[POLLING RESPONSE] is_paid: ${data.is_paid}, Tingg status code: ${data.checkout_status_code}`);
+
+          if (data.is_paid === true) {
+            clearInterval(pollingInterval);
+            console.log("[POLLING SUCCESS] Payment confirmed successfully. Redirecting...");
+            window.location.href = SUCCESS_PAGE_URL;
+          }
+        } else {
+          console.error(`[POLLING HTTP ERROR] Status checker returned HTTP status: ${response.status}`);
+        }
+      } catch (err) {
+        console.error("[POLLING FETCH ERROR] Failed to connect to status endpoint:", err);
+      }
+    }, 4000);
+  }
+
+  async function recordAndSubmit() {
+    if (isProcessing) return;
+    const amount = document.getElementById('donation-amount').value;
+    if (!amount || parseFloat(amount) <= 0) { alert("Please enter a valid amount."); return; }
+    
+    const momoNumber = document.getElementById('momo-number').value.trim();
+    const zambiaPhoneRegex = /^(09|07|05|2609|2607|2605)\d{8}$/;
+    if (!momoNumber || !zambiaPhoneRegex.test(momoNumber)) {
+      alert("Please enter a valid Zambian Mobile Money number.");
+      return;
+    }
+
+    isProcessing = true;
+    const payBtn = document.getElementById('pay-button');
+    payBtn.disabled = true;
+    payBtn.innerText = "Processing...";
+
+    const donorRecord = {
+      donorName: document.getElementById('is-anonymous').checked ? 'Anonymous' : document.getElementById('donor-name').value,
+      donationAmount: parseFloat(amount),
+      donationCurrency: document.getElementById('currency-picker').value,
+      messageText: document.getElementById('donor-message').value,
+      paymentMethod: selectedMethod,
+      phoneNumber: momoNumber,
+      network: document.getElementById('momo-network').value
+    };
+
+    document.querySelector('.zrc-header').style.display = 'none';
+    document.getElementById('step-2-state').style.display = 'none';
+
+    document.getElementById('iframe-state').style.display = 'block';
+    document.getElementById('iframe-state').classList.add('active');
+    document.getElementById('loader-view').style.display = 'flex';
+    document.getElementById('success-view').style.display = 'none';
+
+    try {
+      const res = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(donorRecord)
+      });
+
+      const data = await res.json();
+
+      if (res.ok && (data.status === 'success' || data.success === true)) {
+        if (selectedMethod === 'momo') {
+          document.getElementById('loader-view').style.display = 'none';
+          document.getElementById('success-view').style.display = 'flex';
+          
+          document.getElementById('success-message').innerHTML = `<strong>Initiated Successfully!</strong><br>
+          Please check your phone now for the Mobile Money PIN prompt. Once you authorize it, this page will update automatically.`;
+          
+          startStatusPolling(data.merchant_transaction_id);
+        } else {
+          // --- CARD / VISA POST REDIRECT ---
+          if (data.routing_url && data.post_params) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = data.routing_url;
+            
+            const params = data.post_params;
+            for (const key in params) {
+              if (params.hasOwnProperty(key)) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = typeof params[key] === 'object' ? JSON.stringify(params[key]) : params[key];
+                form.appendChild(input);
+              }
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+          } else if (data.redirect_url) {
+            window.location.href = data.redirect_url;
+          } else {
+            throw new Error("Secure payment link not received. Please try again.");
+          }
+        }
+      } else {
+        throw new Error(data.error || 'Transaction failed');
+      }
+    } catch (err) {
+      console.error("Submission Error:", err);
+      alert("Error: " + err.message);
+      
+      document.getElementById('iframe-state').style.display = 'none';
+      document.querySelector('.zrc-header').style.display = 'flex';
+      document.getElementById('step-2-state').style.display = 'block';
+
+      payBtn.disabled = false;
+      payBtn.innerText = `Pay ${document.getElementById('currency-picker').value} ${amount}`;
+      isProcessing = false;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', updateAmountDisplay);
+</script>
