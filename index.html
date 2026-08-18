@@ -3,303 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZRC Donation Portal | Secure Payment</title>
+    <title>ZRC Donation Form</title>
     <style>
-        /* --- Base Layout & Reset --- */
-        :root {
-            --zrc-red: #e21a22;
-            --zrc-red-dark: #b3151b;
-            --zrc-gray-light: #f8f9fa;
-            --zrc-gray-border: #eef0f2;
-            --text-dark: #212529;
-            --text-muted: #6c757d;
+        /* Reset & Base Layout */
+        main, .layout-content, .region-content, .block-system-main-block, article, .node, .node__content, .field--name-body, .content, .clearfix { 
+            display: block !important; width: 100% !important; max-width: 1140px !important; margin: 0 auto !important; padding: 0 24px !important; box-sizing: border-box !important; 
         }
+        .template--with-sidebar__content { display: block !important; width: 100% !important; max-width: 1140px !important; margin: 0 auto !important; padding: 0 24px !important; box-sizing: border-box !important; }
+        .template--with-sidebar__content__sidebar { display: none !important; }
+        .template--with-sidebar__content__main { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
+        
+        /* Grid & Card */
+        .zrc-grid { display: block !important; margin: 15px auto !important; width: 100% !important; max-width: 100% !important; padding: 0 10px !important; box-sizing: border-box; font-family: -apple-system, system-ui, sans-serif; }
+        @media (min-width: 768px) { .zrc-grid { margin: 40px auto !important; max-width: 700px !important; padding: 0 20px !important; } }
+        
+        .zrc-main-card { background: #ffffff; border: 1px solid #eef0f2; border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); box-sizing: border-box; width: 100%; min-height: 550px; position: relative; }
+        @media (min-width: 768px) { .zrc-main-card { padding: 35px; } }
+        
+        /* Header */
+        .zrc-header { display: flex; flex-direction: column; align-items: center; gap: 15px; border-bottom: 1px solid #e9ecef; padding-bottom: 20px; margin-bottom: 25px; }
+        @media (min-width: 768px) { .zrc-header { flex-direction: row; justify-content: space-between; } }
+        
+        .zrc-back-btn { background: #f1f3f5; color: #495057; border: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-weight: bold; cursor: pointer; transition: background 0.15s; }
+        .zrc-logo { height: auto; max-width: 110px; object-fit: contain; }
+        @media (min-width: 768px) { .zrc-logo { max-width: 140px; } }
+        
+        .zrc-amount-box { text-align: center; }
+        @media (min-width: 768px) { .zrc-amount-box { text-align: right; } }
+        .zrc-amount-label { display: block; font-size: 0.7rem; font-weight: bold; color: #868e96; letter-spacing: 1px; }
+        .zrc-amount-val { font-size: 1.3rem; font-weight: 800; color: #1a1a1a; }
+        .zrc-currency-tag { font-size: 0.8rem; font-weight: bold; color: #6c757d; background: #f1f3f5; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+        
+        /* Inputs & Grid */
+        .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        .amount-pill { background: #f8f9fa; border: 2px solid #f1f3f5; padding: 10px; font-size: 0.9rem; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; color: #495057; user-select: none; }
+        .amount-pill.active { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border-color: #e21a22; box-shadow: 0 4px 10px rgba(226, 26, 34, 0.2); }
+        
+        .custom-amount-wrapper { position: relative; margin-bottom: 15px; }
+        .custom-amount-input { width: 100%; padding: 12px; font-size: 1.15rem; font-weight: bold; border: 2px solid #e9ecef; border-radius: 8px; box-sizing: border-box; padding-right: 110px; color: #212529; }
+        .currency-select { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: #f1f3f5; font-weight: bold; padding: 10px 12px; border-radius: 6px; cursor: pointer; }
+        
+        .form-group { margin-bottom: 18px; text-align: left; }
+        .form-label { display: block; font-size: 0.9rem; font-weight: bold; color: #495057; margin-bottom: 6px; }
+        .form-text-input, .form-select-input { width: 100%; padding: 10px 12px; border: 2px solid #e9ecef; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; color: #333; transition: border 0.3s; background: #fff; }
+        .form-text-input:focus, .form-select-input:focus { border-color: #e21a22; outline: none; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f7f9;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--text-dark);
-        }
+        .payment-method-selector { display: flex; gap: 15px; margin-top: 5px; }
+        .method-option { flex: 1; position: relative; }
+        .method-option input { position: absolute; opacity: 0; cursor: pointer; }
+        .method-label { display: block; text-align: center; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; font-weight: bold; color: #495057; cursor: pointer; transition: all 0.2s; }
+        .method-option input:checked + .method-label { background: #f8f9fa; border-color: #e21a22; color: #e21a22; }
 
-        /* --- Main Container --- */
-        .zrc-grid {
-            width: 100%;
-            max-width: 600px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .zrc-main-card {
-            background: #ffffff;
-            border: 1px solid var(--zrc-gray-border);
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-            position: relative;
-            overflow: hidden;
-            min-height: 600px;
-        }
-
-        /* --- Header Section --- */
-        .zrc-header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--zrc-gray-border);
-            padding-bottom: 20px;
-        }
-
-        .zrc-logo {
-            max-width: 150px;
-            height: auto;
-            margin-bottom: 15px;
-        }
-
-        .zrc-title {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--text-dark);
-            margin: 0;
-        }
-
-        /* --- Amount Selection --- */
-        .amount-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .amount-pill {
-            background: var(--zrc-gray-light);
-            border: 2px solid var(--zrc-gray-border);
-            padding: 12px;
-            text-align: center;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: var(--text-muted);
-        }
-
-        .amount-pill:hover {
-            border-color: #ccc;
-        }
-
-        .amount-pill.active {
-            background: linear-gradient(135deg, var(--zrc-red) 0%, #ff3b42 100%);
-            color: white;
-            border-color: var(--zrc-red);
-            box-shadow: 0 4px 12px rgba(226, 26, 34, 0.3);
-        }
-
-        .custom-amount-wrapper {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
-        .custom-amount-input {
-            width: 100%;
-            padding: 15px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            border: 2px solid var(--zrc-gray-border);
-            border-radius: 10px;
-            box-sizing: border-box;
-            padding-right: 110px;
-            transition: border 0.3s;
-        }
-
-        .custom-amount-input:focus {
-            border-color: var(--zrc-red);
-            outline: none;
-        }
-
-        .currency-select {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            border: none;
-            background: var(--zrc-gray-light);
-            font-weight: 700;
-            padding: 10px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        /* --- Form Groups --- */
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-
-        .form-text-input, .form-select-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--zrc-gray-border);
-            border-radius: 8px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            transition: border 0.3s;
-        }
-
-        .form-text-input:focus, .form-select-input:focus {
-            border-color: var(--zrc-red);
-            outline: none;
-        }
-
-        /* --- Payment Method --- */
-        .payment-method-selector {
-            display: flex;
-            gap: 12px;
-            margin-top: 5px;
-        }
-
-        .method-option {
-            flex: 1;
-            position: relative;
-        }
-
-        .method-option input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .method-label {
-            display: block;
-            text-align: center;
-            padding: 12px;
-            border: 2px solid var(--zrc-gray-border);
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .method-option input:checked + .method-label {
-            border-color: var(--zrc-red);
-            color: var(--zrc-red);
-            background: rgba(226, 26, 34, 0.05);
-        }
-
-        /* --- Extra Options --- */
-        .inline-checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .inline-checkbox-group input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .inline-checkbox-group label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        /* --- Submit Button --- */
-        .submit-donation-btn {
-            background: linear-gradient(135deg, var(--zrc-red) 0%, #ff3b42 100%);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 16px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(226, 26, 34, 0.25);
-            transition: all 0.3s;
-        }
-
-        .submit-donation-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(226, 26, 34, 0.35);
-        }
-
-        .submit-donation-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        /* --- State Management --- */
-        .state-container {
-            display: none;
-        }
-
-        .state-container.active {
-            display: flex;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .state-wrapper-box {
-            position: absolute;
-            inset: 0;
-            background: white;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            z-index: 10;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--zrc-red);
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
+        .inline-checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+        .inline-checkbox-group input { width: 18px; height: 18px; cursor: pointer; }
+        .inline-checkbox-group label { font-size: 0.9rem; font-weight: bold; color: #495057; cursor: pointer; }
+        
+        .submit-donation-btn { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 1.05rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(226, 26, 34, 0.3); transition: all 0.3s; }
+        .submit-donation-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(226, 26, 34, 0.45); }
+        .submit-donation-btn:disabled { background: #ccc !important; cursor: not-allowed; }
+        
+        .state-container { display: none; }
+        .state-container.active { display: flex; animation: fadeIn 0.4s ease; }
+        
+        .state-wrapper-box { position: absolute; inset: 0; background: white; padding: 35px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 10; border-radius: 12px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #e21a22; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         .state-error { color: #dc3545; }
-        .retry-btn {
-            background: var(--zrc-red);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-weight: 700;
-        }
+        .retry-btn { background: #e21a22; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-top: 15px; font-weight: bold; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        @media (max-width: 480px) {
-            .amount-grid { grid-template-columns: repeat(2, 1fr); }
-            .zrc-main-card { padding: 20px; }
-        }
     </style>
 </head>
 <body>
 
 <div class="zrc-grid">
+    <div class="zrc-main-card">
+        
+        <!-- Form View Component -->
+       
 
             <form id="donation-form" onsubmit="handleDonationSubmit(event)">
                 <div class="amount-grid">
@@ -337,12 +118,12 @@
 
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
-                    <input type="text" id="donor-name" class="form-text-input" placeholder="Enter your full name" required>
+                    <input type="text" id="donor-name" class="form-text-input" placeholder="John Doe" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
-                    <input type="email" id="donor-email" class="form-text-input" placeholder="email@example.com" required>
+                    <input type="email" id="donor-email" class="form-text-input" placeholder="johndoe@example.com" required>
                 </div>
 
                 <div class="form-group">
@@ -365,12 +146,12 @@
 
                 <div class="inline-checkbox-group">
                     <input type="checkbox" id="is-anonymous" onchange="toggleAnonymous()">
-                    <label for="is-anonymous">Donate anonymously</label>
+                    <label for="is-anonymous">Make this donation anonymous</label>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Message (Optional)</label>
-                    <textarea id="message-text" class="form-text-input" style="min-height:60px;resize:none;" placeholder="Leave a note..."></textarea>
+                    <textarea id="message-text" class="form-text-input" style="min-height:60px;resize:none;"></textarea>
                 </div>
 
                 <button type="submit" class="submit-donation-btn" id="pay-button">Proceed with ZMW 50.00</button>
@@ -381,14 +162,14 @@
         <div id="loading-state" class="state-container">
             <div class="state-wrapper-box">
                 <div class="spinner"></div>
-                <p>Securing your payment portal...</p>
+                <p>Preparing secure payment portal...</p>
             </div>
         </div>
 
         <!-- Error State -->
         <div id="error-state" class="state-container">
             <div class="state-wrapper-box state-error">
-                <div style="font-size:3rem; margin-bottom:15px;">⚠️</div>
+                <div style="font-size:3rem;">⚠️</div>
                 <h3>Payment Failed</h3>
                 <p id="error-description"></p>
                 <button class="retry-btn" onclick="resetForm()">Try Again</button>
@@ -402,9 +183,12 @@
     const API_ENDPOINT = 'https://zrc-payment-backend.vercel.app/api/checkout';
     let isProcessing = false;
 
+    // UI Updates
     function updateSummaryDisplay() {
         const amt = parseFloat(document.getElementById('custom-amount').value) || 0;
         const curr = document.getElementById('currency').value;
+        document.getElementById('summary-val').innerText = amt.toFixed(2);
+        document.getElementById('summary-currency').innerText = curr;
         document.getElementById('pay-button').innerText = `Proceed with ${curr} ${amt.toFixed(2)}`;
     }
 
@@ -412,8 +196,12 @@
         document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('active'));
         element.classList.add('active');
         const input = document.getElementById('custom-amount');
-        input.value = val === "" ? '' : val;
-        if(val === "") input.focus();
+        if(val === "") {
+            input.value = '';
+            input.focus();
+        } else {
+            input.value = val;
+        }
         updateSummaryDisplay();
     }
 
@@ -421,15 +209,12 @@
         const method = document.querySelector('input[name="payment_method"]:checked').value;
         const label = document.getElementById('phone-label');
         const input = document.getElementById('donor-phone');
-        
-        // IMPORTANT: Phone is now REQUIRED for all users due to API rules
-        label.innerHTML = 'Mobile Phone Number <span style="color:red">*</span>';
-        input.required = true; 
-        
         if (method === 'card') {
-            input.placeholder = "e.g. 0971234567 (Required for confirmation)";
+            label.innerHTML = 'Mobile Phone Number (Optional)';
+            input.required = false;
         } else {
-            input.placeholder = "e.g. 0971234567";
+            label.innerHTML = 'Mobile Phone Number <span style="color:red">*</span>';
+            input.required = true;
         }
     }
 
@@ -441,7 +226,7 @@
             label.innerHTML = 'Mobile Phone Number <span style="color:red">*</span>';
             input.placeholder = "e.g. 0971234567";
         } else {
-            label.innerHTML = 'Mobile Phone Number (Include Country Code) <span style="color:red">*</span>';
+            label.innerHTML = 'Mobile Phone Number (Include Country Code)';
             input.placeholder = "e.g. 254712345678";
         }
     }
@@ -451,7 +236,6 @@
         const nameInput = document.getElementById('donor-name');
         nameInput.value = isAnon ? 'Anonymous' : '';
         nameInput.disabled = isAnon;
-        if (!isAnon) nameInput.focus();
     }
 
     function switchState(state) {
@@ -464,6 +248,7 @@
         isProcessing = false;
     }
 
+    // CORE SUBMISSION LOGIC
     async function handleDonationSubmit(event) {
         event.preventDefault();
         if (isProcessing) return;
@@ -471,6 +256,8 @@
 
         switchState('loading');
 
+        // Enhanced payload with transaction tracking
+        const transactionId = `ZRC-FRONT-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
         const payload = {
             donorName: document.getElementById('is-anonymous').checked ? 'Anonymous' : document.getElementById('donor-name').value,
             donationAmount: document.getElementById('custom-amount').value,
@@ -479,40 +266,75 @@
             donorCountry: document.getElementById('donor-country').value,
             donorPhone: document.getElementById('donor-phone').value,
             paymentMethod: document.querySelector('input[name="payment_method"]:checked').value,
-            messageText: document.getElementById('message-text').value
+            messageText: document.getElementById('message-text').value,
+            transactionId: transactionId  // Added for backend correlation
+        };
+        
+        // Store transaction details for support reference
+        sessionStorage.setItem('lastTransaction', JSON.stringify({
+            id: transactionId,
+            amount: payload.donationAmount,
+            currency: payload.donationCurrency,
+            timestamp: new Date().toISOString()
+        }));
+
+        let retryCount = 0;
+        const maxRetries = 3;
+        const retryDelay = 2000; // 2 seconds
+
+        const attemptPayment = async () => {
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.status === 500) {
+                    throw new Error('Payment gateway is currently unavailable. Please try again later.');
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Payment processing failed (Status: ${response.status}). Please try again.`);
+                }
+
+                const result = await response.json();
+
+                if (!result.status || result.status !== 'success') {
+                    throw new Error(result.error || 'Payment could not be processed. Please check your details and try again.');
+                }
+
+                if (!result.redirect_url) {
+                    throw new Error('Payment gateway configuration error. Please contact support.');
+                }
+
+                window.location.href = result.redirect_url;
+            } catch (err) {
+                console.error(`Donation submission attempt ${retryCount + 1} failed:`, err);
+                
+                if (retryCount < maxRetries - 1) {
+                    retryCount++;
+                    document.getElementById('error-description').innerText = 
+                        `Attempt ${retryCount} failed. Retrying in ${retryDelay/1000} seconds...`;
+                    await new Promise(resolve => setTimeout(resolve, retryDelay));
+                    return attemptPayment();
+                }
+                
+                document.getElementById('error-description').innerText = 
+                    err.message || 'Payment processing failed after multiple attempts. Please try again later.';
+                switchState('error');
+                isProcessing = false;
+
+                if (typeof logError === 'function') {
+                    logError(err);
+                }
+            }
         };
 
-        try {
-            const response = await fetch(API_ENDPOINT, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                // Display the actual description from the server if available
-                throw new Error(result.description || result.error || `Error ${response.status}`);
-            }
-
-            if (result.status === 'success' && result.redirect_url) {
-                window.location.href = result.redirect_url;
-            } else {
-                throw new Error('Payment gateway configuration error.');
-            }
-        } catch (err) {
-            console.error('Payment Error:', err);
-            document.getElementById('error-description').innerText = err.message;
-            switchState('error');
-            isProcessing = false;
-        }
+        attemptPayment();
     }
 
-    // Event Listeners
-    document.querySelectorAll('.amount-pill').forEach(pill => {
-        pill.addEventListener('click', () => selectAmount(pill.dataset.value, pill));
-    });
+    // Listeners
     document.getElementById('custom-amount').addEventListener('input', () => {
         document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('active'));
         document.getElementById('custom-pill').classList.add('active');
