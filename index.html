@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZRC Donation Form</title>
     <style>
-        /* Reset & Base Layout (Retaining !important for CMS compatibility) */
+        /* Reset & Base Layout */
         main, .layout-content, .region-content, .block-system-main-block, article, .node, .node__content, .field--name-body, .content, .clearfix { 
             display: block !important; width: 100% !important; max-width: 1140px !important; margin: 0 auto !important; padding: 0 24px !important; box-sizing: border-box !important; 
         }
@@ -36,7 +36,7 @@
         
         /* Inputs & Grid */
         .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        .amount-pill { background: #f8f9fa; border: 2px solid #f1f3f5; padding: 10px; font-size: 0.9rem; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; color: #495057; }
+        .amount-pill { background: #f8f9fa; border: 2px solid #f1f3f5; padding: 10px; font-size: 0.9rem; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; color: #495057; user-select: none; }
         .amount-pill.active { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border-color: #e21a22; box-shadow: 0 4px 10px rgba(226, 26, 34, 0.2); }
         
         .custom-amount-wrapper { position: relative; margin-bottom: 15px; }
@@ -45,28 +45,30 @@
         
         .form-group { margin-bottom: 18px; text-align: left; }
         .form-label { display: block; font-size: 0.9rem; font-weight: bold; color: #495057; margin-bottom: 6px; }
-        .form-text-input, .form-select-input { width: 100%; padding: 10px 12px; border: 2px solid #e9ecef; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; color: #333; transition: border 0.3s; }
-        .form-text-input:focus { border-color: #e21a22; outline: none; }
+        .form-text-input, .form-select-input { width: 100%; padding: 10px 12px; border: 2px solid #e9ecef; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; color: #333; transition: border 0.3s; background: #fff; }
+        .form-text-input:focus, .form-select-input:focus { border-color: #e21a22; outline: none; }
 
-        /* Payment Method Toggle */
         .payment-method-selector { display: flex; gap: 15px; margin-top: 5px; }
         .method-option { flex: 1; position: relative; }
         .method-option input { position: absolute; opacity: 0; cursor: pointer; }
         .method-label { display: block; text-align: center; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; font-weight: bold; color: #495057; cursor: pointer; transition: all 0.2s; }
         .method-option input:checked + .method-label { background: #f8f9fa; border-color: #e21a22; color: #e21a22; }
 
-        /* Checkbox & Button */
         .inline-checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+        .inline-checkbox-group input { width: 18px; height: 18px; cursor: pointer; }
+        .inline-checkbox-group label { font-size: 0.9rem; font-weight: bold; color: #495057; cursor: pointer; }
+        
         .submit-donation-btn { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 1.05rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(226, 26, 34, 0.3); transition: all 0.3s; }
         .submit-donation-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(226, 26, 34, 0.45); }
         .submit-donation-btn:disabled { background: #ccc !important; cursor: not-allowed; }
         
-        /* States: Loading & Error */
-        .state-container { display: none; position: absolute; inset: 0; background: white; padding: 35px; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 10; }
+        .state-container { display: none; }
         .state-container.active { display: flex; animation: fadeIn 0.4s ease; }
+        
+        .state-wrapper-box { position: absolute; inset: 0; background: white; padding: 35px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 10; border-radius: 12px; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #e21a22; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         .state-error { color: #dc3545; }
-        .retry-btn { background: #e21a22; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-top: 15px; }
+        .retry-btn { background: #e21a22; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-top: 15px; font-weight: bold; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -77,7 +79,7 @@
 <div class="zrc-grid">
     <div class="zrc-main-card">
         
-        <!-- Form State -->
+        <!-- Form View Component -->
         <div id="form-state" class="state-container active">
             <div class="zrc-header">
                 <button type="button" class="zrc-back-btn" onclick="window.history.back()">&lt;</button>
@@ -106,6 +108,8 @@
                     <select id="currency" class="currency-select">
                         <option value="ZMW">ZMW</option>
                         <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
                     </select>
                 </div>
 
@@ -124,13 +128,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Your Name</label>
-                    <input type="text" id="donor-name" class="form-text-input" placeholder="Enter full name">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="donor-name" class="form-text-input" placeholder="John Doe" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Email Address <span style="color:red">*</span></label>
-                    <input type="email" id="donor-email" class="form-text-input" placeholder="email@example.com" required>
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="donor-email" class="form-text-input" placeholder="johndoe@example.com" required>
                 </div>
 
                 <div class="form-group">
@@ -139,12 +143,15 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Country</label>
+                    <label class="form-label">Billing Country</label>
                     <select id="donor-country" class="form-select-input" onchange="toggleCountryRules()">
-                        <option value="ZM">Zambia (ZM)</option>
+                        <option value="ZM" selected>Zambia (ZM)</option>
                         <option value="KE">Kenya (KE)</option>
+                        <option value="TZ">Tanzania (TZ)</option>
                         <option value="UG">Uganda (UG)</option>
-                        <option value person="US">United States (US)</option>
+                        <option value="ZA">South Africa (ZA)</option>
+                        <option value="US">United States (US)</option>
+                        <option value="GB">United Kingdom (GB)</option>
                     </select>
                 </div>
 
@@ -164,13 +171,15 @@
 
         <!-- Loading State -->
         <div id="loading-state" class="state-container">
-            <div class="spinner"></div>
-            <p>Preparing secure payment portal...</p>
+            <div class="state-wrapper-box">
+                <div class="spinner"></div>
+                <p>Preparing secure payment portal...</p>
+            </div>
         </div>
 
         <!-- Error State -->
         <div id="error-state" class="state-container">
-            <div class="state-error">
+            <div class="state-wrapper-box state-error">
                 <div style="font-size:3rem;">⚠️</div>
                 <h3>Payment Failed</h3>
                 <p id="error-description"></p>
@@ -185,7 +194,7 @@
     const API_ENDPOINT = 'https://zrc-payment-backend.vercel.app/api/checkout';
     let isProcessing = false;
 
-    // Update Summary Display
+    // UI Updates
     function updateSummaryDisplay() {
         const amt = parseFloat(document.getElementById('custom-amount').value) || 0;
         const curr = document.getElementById('currency').value;
@@ -194,43 +203,17 @@
         document.getElementById('pay-button').innerText = `Proceed with ${curr} ${amt.toFixed(2)}`;
     }
 
-    // Handle Amount Pills
-    document.querySelectorAll('.amount-pill').forEach(pill => {
-        pill.addEventListener('click', function() {
-            document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('active'));
-            this.classList.add('active');
-            const val = this.getAttribute('data-value');
-            if(val === "") {
-                document.getElementById('custom-amount').value = '';
-                document.getElementById('custom-amount').focus();
-            } else {
-                document.getElementById('custom-amount').value = val;
-            }
-            updateSummaryDisplay();
-        });
-    });
-
-    document.getElementById('custom-amount').addEventListener('input', () => {
+    function selectAmount(val, element) {
         document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('active'));
-        updateSummaryDisplay();
-    });
-
-    document.getElementById('currency').addEventListener('change', updateSummaryDisplay);
-
-    // Dynamic Country/Phone Logic
-    function toggleCountryRules() {
-        const country = document.getElementById('donor-country').value;
-        const label = document.getElementById('phone-label');
-        const phoneInput = document.getElementById('donor-phone');
-        if (country === 'ZM') {
-            label.innerHTML = 'Mobile Phone Number <span style="color:red">*</span>';
-            phoneInput.placeholder = "e.g. 0971234567";
-            phoneInput.required = true;
+        element.classList.add('active');
+        const input = document.getElementById('custom-amount');
+        if(val === "") {
+            input.value = '';
+            input.focus();
         } else {
-            label.innerHTML = 'Mobile Phone Number (Optional)';
-            phoneInput.placeholder = "Include country code";
-            phoneInput.required = false;
+            input.value = val;
         }
+        updateSummaryDisplay();
     }
 
     function handleMethodChange() {
@@ -246,6 +229,19 @@
         }
     }
 
+    function toggleCountryRules() {
+        const country = document.getElementById('donor-country').value;
+        const label = document.getElementById('phone-label');
+        const input = document.getElementById('donor-phone');
+        if (country === 'ZM') {
+            label.innerHTML = 'Mobile Phone Number <span style="color:red">*</span>';
+            input.placeholder = "e.g. 0971234567";
+        } else {
+            label.innerHTML = 'Mobile Phone Number (Include Country Code)';
+            input.placeholder = "e.g. 254712345678";
+        }
+    }
+
     function toggleAnonymous() {
         const isAnon = document.getElementById('is-anonymous').checked;
         const nameInput = document.getElementById('donor-name');
@@ -254,16 +250,16 @@
     }
 
     function switchState(state) {
-        document.getElementById('form-state').classList.remove('active');
-        document.getElementById('loading-state').classList.remove('active');
-        document.getElementById('error-state').classList.remove('active');
+        document.querySelectorAll('.state-container').forEach(el => el.classList.remove('active'));
         document.getElementById(state + '-state').classList.add('active');
     }
 
     function resetForm() {
         switchState('form');
+        isProcessing = false;
     }
 
+    // CORE SUBMISSION LOGIC
     async function handleDonationSubmit(event) {
         event.preventDefault();
         if (isProcessing) return;
@@ -299,12 +295,19 @@
                 isProcessing = false;
             }
         } catch (err) {
-            document.getElementById('error-description').innerText = 'Connection Error. Please try again.';
+            document.getElementById('error-description').innerText = 'Network connection failed.';
             switchState('error');
             isProcessing = false;
         }
     }
 
+    // Listeners
+    document.getElementById('custom-amount').addEventListener('input', () => {
+        document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('active'));
+        document.getElementById('custom-pill').classList.add('active');
+        updateSummaryDisplay();
+    });
+    document.getElementById('currency').addEventListener('change', updateSummaryDisplay);
     document.addEventListener('DOMContentLoaded', updateSummaryDisplay);
 </script>
 
