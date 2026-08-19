@@ -264,13 +264,10 @@
     const currencyPicker = document.getElementById('currency-picker');
     const amount = amountInput ? amountInput.value || '0.00' : '0.00';
     const currency = currencyPicker ? currencyPicker.value : 'ZMW';
-    
     document.getElementById('header-amount-val').innerText = parseFloat(amount).toFixed(2);
     document.getElementById('header-currency-tag').innerText = currency;
-    
     const payBtn = document.getElementById('pay-button');
     if (payBtn) payBtn.innerText = `Pay ${currency} ${parseFloat(amount).toFixed(2)}`;
-    
     const tabs = document.querySelectorAll('.zrc-tab');
     if (parseFloat(amount) > 0) {
       tabs.forEach(t => t.classList.add('enabled'));
@@ -304,21 +301,16 @@
   function startStatusPolling(merchantTxnId) {
     let attempts = 0;
     const maxAttempts = 30;
-    
     const amount = document.getElementById('donation-amount').value;
     const currency = document.getElementById('currency-picker').value;
     
-    console.log(`[POLLING STARTED] Monitoring transaction: ${merchantTxnId}`);
-
     pollingInterval = setInterval(async () => {
       attempts++;
       if (attempts > maxAttempts) {
         clearInterval(pollingInterval);
-        document.getElementById('success-message').innerHTML = `<strong>Verification Timeout</strong><br>
-        If the money has been deducted from your account but this screen hasn't updated, please check your SMS receipt or contact support.`;
+        document.getElementById('success-message').innerHTML = `<strong>Verification Timeout</strong><br>Please contact support if money was deducted.`;
         return;
       }
-
       try {
         const response = await fetch(`${STATUS_ENDPOINT}?merchant_transaction_id=${merchantTxnId}&amount=${amount}&currency=${currency}&t=${Date.now()}`);
         if (response.ok) {
@@ -328,9 +320,7 @@
             window.location.href = SUCCESS_PAGE_URL;
           }
         }
-      } catch (err) {
-        console.error("[POLLING FETCH ERROR]", err);
-      }
+      } catch (err) { console.error(err); }
     }, 4000);
   }
 
@@ -338,7 +328,6 @@
     if (isProcessing) return;
     const amount = document.getElementById('donation-amount').value;
     if (!amount || parseFloat(amount) <= 0) { alert("Please enter a valid amount."); return; }
-    
     const momoNumber = document.getElementById('momo-number').value.trim();
     const zambiaPhoneRegex = /^(09|07|05|2609|2607|2605)\d{8}$/;
     if (!momoNumber || !zambiaPhoneRegex.test(momoNumber)) {
@@ -378,18 +367,17 @@
       const data = await res.json();
 
       if (res.ok && (data.status === 'success' || data.success === true)) {
-        // FIXED: Regardless of method, if a redirect_url is provided, we MUST use it to trigger the payment.
+        // THE FIX: Always try to redirect to the Tingg URL first!
         if (data.redirect_url) {
-          window.location.href = data.redirect_url;
+          console.log("Redirecting to Tingg...");
+          window.location.href = data.redirect_url; 
         } else if (selectedMethod === 'momo') {
-          // Fallback if for some reason no URL is sent but it's MoMo
           document.getElementById('loader-view').style.display = 'none';
           document.getElementById('success-view').style.display = 'flex';
-          document.getElementById('success-message').innerHTML = `<strong>Initiated Successfully!</strong><br>
-          Please check your phone now for the Mobile Money PIN prompt.`;
+          document.getElementById('success-message').innerHTML = `<strong>Initiated Successfully!</strong><br>Please check your phone for the PIN prompt.`;
           startStatusPolling(data.merchant_transaction_id);
         } else {
-          throw new Error("Secure payment link not received. Please try again.");
+          throw new Error("Secure payment link not received.");
         }
       } else {
         throw new Error(data.error || 'Transaction failed');
