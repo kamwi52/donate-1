@@ -312,11 +312,8 @@
 
     pollingInterval = setInterval(async () => {
       attempts++;
-      console.log(`[POLLING] Attempt ${attempts}/${maxAttempts} checking status...`);
-
       if (attempts > maxAttempts) {
         clearInterval(pollingInterval);
-        console.warn("[POLLING TIMEOUT] Verification timed out after 2 minutes.");
         document.getElementById('success-message').innerHTML = `<strong>Verification Timeout</strong><br>
         If the money has been deducted from your account but this screen hasn't updated, please check your SMS receipt or contact support.`;
         return;
@@ -326,18 +323,13 @@
         const response = await fetch(`${STATUS_ENDPOINT}?merchant_transaction_id=${merchantTxnId}&amount=${amount}&currency=${currency}&t=${Date.now()}`);
         if (response.ok) {
           const data = await response.json();
-          console.log(`[POLLING RESPONSE] is_paid: ${data.is_paid}, Tingg status code: ${data.checkout_status_code}`);
-
           if (data.is_paid === true) {
             clearInterval(pollingInterval);
-            console.log("[POLLING SUCCESS] Payment confirmed successfully. Redirecting...");
             window.location.href = SUCCESS_PAGE_URL;
           }
-        } else {
-          console.error(`[POLLING HTTP ERROR] Status checker returned HTTP status: ${response.status}`);
         }
       } catch (err) {
-        console.error("[POLLING FETCH ERROR] Failed to connect to status endpoint:", err);
+        console.error("[POLLING FETCH ERROR]", err);
       }
     }, 4000);
   }
@@ -371,7 +363,6 @@
 
     document.querySelector('.zrc-header').style.display = 'none';
     document.getElementById('step-2-state').style.display = 'none';
-
     document.getElementById('iframe-state').style.display = 'block';
     document.getElementById('iframe-state').classList.add('active');
     document.getElementById('loader-view').style.display = 'flex';
@@ -387,39 +378,18 @@
       const data = await res.json();
 
       if (res.ok && (data.status === 'success' || data.success === true)) {
-        if (selectedMethod === 'momo') {
+        // FIXED: Regardless of method, if a redirect_url is provided, we MUST use it to trigger the payment.
+        if (data.redirect_url) {
+          window.location.href = data.redirect_url;
+        } else if (selectedMethod === 'momo') {
+          // Fallback if for some reason no URL is sent but it's MoMo
           document.getElementById('loader-view').style.display = 'none';
           document.getElementById('success-view').style.display = 'flex';
-          
           document.getElementById('success-message').innerHTML = `<strong>Initiated Successfully!</strong><br>
-          Please check your phone now for the Mobile Money PIN prompt. Once you authorize it, this page will update automatically.`;
-          
+          Please check your phone now for the Mobile Money PIN prompt.`;
           startStatusPolling(data.merchant_transaction_id);
         } else {
-          // --- CARD / VISA POST REDIRECT ---
-          if (data.routing_url && data.post_params) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = data.routing_url;
-            
-            const params = data.post_params;
-            for (const key in params) {
-              if (params.hasOwnProperty(key)) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = typeof params[key] === 'object' ? JSON.stringify(params[key]) : params[key];
-                form.appendChild(input);
-              }
-            }
-            
-            document.body.appendChild(form);
-            form.submit();
-          } else if (data.redirect_url) {
-            window.location.href = data.redirect_url;
-          } else {
-            throw new Error("Secure payment link not received. Please try again.");
-          }
+          throw new Error("Secure payment link not received. Please try again.");
         }
       } else {
         throw new Error(data.error || 'Transaction failed');
@@ -427,11 +397,9 @@
     } catch (err) {
       console.error("Submission Error:", err);
       alert("Error: " + err.message);
-      
       document.getElementById('iframe-state').style.display = 'none';
       document.querySelector('.zrc-header').style.display = 'flex';
       document.getElementById('step-2-state').style.display = 'block';
-
       payBtn.disabled = false;
       payBtn.innerText = `Pay ${document.getElementById('currency-picker').value} ${amount}`;
       isProcessing = false;
