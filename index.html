@@ -317,7 +317,7 @@
           const data = await response.json();
           if (data.is_paid === true) {
             clearInterval(pollingInterval);
-            window.location.href = SUCCESS_PAGE_URL;
+            (window.top || window).location.href = SUCCESS_PAGE_URL;
           }
         }
       } catch (err) { console.error(err); }
@@ -328,10 +328,11 @@
     if (isProcessing) return;
     const amount = document.getElementById('donation-amount').value;
     if (!amount || parseFloat(amount) <= 0) { alert("Please enter a valid amount."); return; }
+    
     const momoNumber = document.getElementById('momo-number').value.trim();
-    const zambiaPhoneRegex = /^(09|07|05|2609|2607|2605)\d{8}$/;
-    if (!momoNumber || !zambiaPhoneRegex.test(momoNumber)) {
-      alert("Please enter a valid Zambian Mobile Money number.");
+    const phoneDigits = momoNumber.replace(/\D/g, '');
+    if (!phoneDigits || phoneDigits.length < 9) {
+      alert("Please enter a valid mobile number for verification and receipt.");
       return;
     }
 
@@ -367,10 +368,10 @@
       const data = await res.json();
 
       if (res.ok && (data.status === 'success' || data.success === true)) {
-        // THE FIX: Always try to redirect to the Tingg URL first!
+        // BREAK OUT OF IFRAME DIRECTLY TO TINGG
         if (data.redirect_url) {
           console.log("Redirecting to Tingg...");
-          window.location.href = data.redirect_url; 
+          (window.top || window).location.href = data.redirect_url;
         } else if (selectedMethod === 'momo') {
           document.getElementById('loader-view').style.display = 'none';
           document.getElementById('success-view').style.display = 'flex';
