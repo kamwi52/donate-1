@@ -1,246 +1,176 @@
-<style>
-  /* Scoped styles for ZRC Donation Widget */
-  #zrc-donation-widget {
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    margin: 15px auto;
-    padding: 0 10px;
-    width: 100%;
-    max-width: 700px;
-  }
-  @media (min-width: 768px) {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZRC Donation</title>
+  <style>
     #zrc-donation-widget {
-      margin: 40px auto;
-      padding: 0 20px;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      margin: 15px auto;
+      padding: 0 10px;
+      width: 100%;
+      max-width: 700px;
     }
-  }
-
-  #zrc-donation-widget .zrc-main-card { background: #ffffff; border: 1px solid #eef0f2; border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); box-sizing: border-box; width: 100%; min-height: 450px; position: relative; }
-  @media (min-width: 768px) { #zrc-donation-widget .zrc-main-card { padding: 35px; min-height: 550px; } }
-
-  #zrc-donation-widget .zrc-header { display: flex; flex-direction: column; align-items: center; gap: 15px; border-bottom: 1px solid #e9ecef; padding-bottom: 20px; margin-bottom: 25px; }
-  @media (min-width: 768px) { #zrc-donation-widget .zrc-header { flex-direction: row; justify-content: space-between; gap: 20px; } }
-
-  #zrc-donation-widget .zrc-header-methods { display: flex; gap: 8px; background: #f1f3f5; padding: 4px; border-radius: 30px; align-items: center; overflow-x: auto; max-width: 100%; box-sizing: border-box; scrollbar-width: none; -ms-overflow-style: none; }
-  #zrc-donation-widget .zrc-header-methods::-webkit-scrollbar { display: none; }
-
-  #zrc-donation-widget .zrc-tab { background: transparent; border: none; border-radius: 20px; padding: 8px 16px; margin: 0; display: inline-flex; align-items: center; font-weight: bold; font-size: 0.82rem; color: #495057; cursor: not-allowed; transition: all 0.2s ease; opacity: 0.35; pointer-events: none; text-decoration: none; white-space: nowrap; user-select: none; }
-  @media (min-width: 768px) { #zrc-donation-widget .zrc-tab { font-size: 0.85rem; } }
-  #zrc-donation-widget .zrc-header-methods.step-2-enabled .zrc-tab { opacity: 0.7; cursor: pointer; pointer-events: auto; }
-  #zrc-donation-widget .zrc-header-methods.step-2-enabled .zrc-tab:hover { background: #dee2e6; color: #212529; opacity: 1; }
-  #zrc-donation-widget .zrc-header-methods.step-2-enabled .zrc-tab.active { background: #e21a22; color: #ffffff; opacity: 1; }
-
-  #zrc-donation-widget .zrc-back-btn { background: #f1f3f5; color: #495057; border: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: background 0.15s; }
-  #zrc-donation-widget .zrc-back-btn:hover { background: #dee2e6; }
-  #zrc-donation-widget .zrc-logo { height: auto; width: auto; max-width: 110px; object-fit: contain; }
-  @media (min-width: 768px) { #zrc-donation-widget .zrc-logo { max-width: 140px; } }
-
-  #zrc-donation-widget .zrc-amount-box { text-align: center; width: 100%; }
-  @media (min-width: 768px) { #zrc-donation-widget .zrc-amount-box { text-align: right; width: auto; } }
-
-  #zrc-donation-widget .zrc-amount-label { display: block; font-size: 0.7rem; font-weight: bold; color: #868e96; letter-spacing: 1px; margin-bottom: 2px; }
-  #zrc-donation-widget .zrc-amount-val { font-size: 1.3rem; font-weight: 800; color: #1a1a1a; }
-  #zrc-donation-widget .zrc-currency-tag { font-size: 0.8rem; font-weight: bold; color: #6c757d; background: #f1f3f5; padding: 2px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
-
-  #zrc-donation-widget .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-  @media (min-width: 768px) { #zrc-donation-widget .amount-grid { gap: 12px; } }
-
-  #zrc-donation-widget .amount-pill { background: #f8f9fa; border: 2px solid #f1f3f5; padding: 10px; font-size: 0.9rem; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; color: #495057; user-select: none; }
-  @media (min-width: 768px) { #zrc-donation-widget .amount-pill { padding: 14px; font-size: 1rem; } }
-  #zrc-donation-widget .amount-pill:hover, #zrc-donation-widget .amount-pill.active { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border-color: #e21a22; box-shadow: 0 4px 10px rgba(226, 26, 34, 0.2); }
-
-  #zrc-donation-widget .custom-amount-wrapper { position: relative; margin-bottom: 15px; }
-  #zrc-donation-widget .custom-amount-input { width: 100%; padding: 12px; font-size: 1.15rem; font-weight: bold; border: 2px solid #e9ecef; border-radius: 8px; box-sizing: border-box; padding-right: 110px; color: #212529; transition: all 0.3s ease; }
-  @media (min-width: 768px) { #zrc-donation-widget .custom-amount-input { padding: 16px; font-size: 1.3rem; } }
-  #zrc-donation-widget .custom-amount-input:focus { border-color: #e21a22; box-shadow: 0 0 10px rgba(226, 26, 34, 0.25); outline: none; }
-  #zrc-donation-widget .currency-select { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background-color: #f1f3f5; font-weight: bold; font-size: 1rem; color: #495057; padding: 10px 12px; border-radius: 6px; cursor: pointer; outline: none; }
-
-  #zrc-donation-widget .form-group { margin-bottom: 18px; text-align: left; }
-  #zrc-donation-widget .form-label { display: block; font-size: 0.9rem; font-weight: bold; color: #495057; margin-bottom: 6px; }
-  #zrc-donation-widget .form-text-input { width: 100%; padding: 10px 12px; border: 2px solid #e9ecef; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; color: #333; transition: all 0.3s ease; }
-  @media (min-width: 768px) { #zrc-donation-widget .form-text-input { padding: 12px 14px; font-size: 1rem; } }
-  #zrc-donation-widget .form-text-input:focus { border-color: #e21a22; box-shadow: 0 0 10px rgba(226, 26, 34, 0.25); outline: none; }
-
-  #zrc-donation-widget .inline-checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
-  #zrc-donation-widget .inline-checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
-  #zrc-donation-widget .inline-checkbox-group label { font-size: 0.9rem; font-weight: bold; color: #495057; margin: 0; cursor: pointer; user-select: none; }
-
-  #zrc-donation-widget .submit-donation-btn { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 1.05rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(226, 26, 34, 0.3); transition: all 0.3s ease; user-select: none; }
-  @media (min-width: 768px) { #zrc-donation-widget .submit-donation-btn { padding: 18px; font-size: 1.15rem; } }
-  #zrc-donation-widget .submit-donation-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(226, 26, 34, 0.45); }
-  #zrc-donation-widget .submit-donation-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
-
-  #zrc-donation-widget .bank-details-box { background: #fff8f8; border: 1px dashed #e21a22; border-radius: 8px; padding: 15px; margin-bottom: 18px; text-align: left; }
-  #zrc-donation-widget .bank-detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; color: #495057; }
-
-  #zrc-donation-widget .state-container { display: none; position: relative; width: 100%; min-height: 350px; }
-  #zrc-donation-widget .state-container.active { display: block; animation: fadeIn 0.4s ease-in-out; }
-  #zrc-donation-widget .state-loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 15px; color: #868e96; font-weight: bold; text-align: center; width: 100%; }
-  #zrc-donation-widget .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #e21a22; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-  
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-  @media (max-width: 767px) {
-    #zrc-donation-widget {
-      margin: 10px auto;
-      padding: 0;
-    }
-    #zrc-donation-widget .zrc-main-card {
-      padding: 15px;
-      min-height: auto;
-      border-radius: 0;
-      border-left: none;
-      border-right: none;
-    }
-  }
-  @media (max-width: 600px) {
-    #zrc-donation-widget .zrc-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-    #zrc-donation-widget .zrc-amount-box { text-align: left; width: 100%; }
-    #zrc-donation-widget .zrc-logo { max-width: 120px; }
-    #zrc-donation-widget .amount-grid { gap: 8px; }
-    #zrc-donation-widget .amount-pill { padding: 10px; font-size: 0.9rem; }
-  }
-</style>
+    @media (min-width: 768px) { #zrc-donation-widget { margin: 40px auto; padding: 0 20px; } }
+    #zrc-donation-widget .zrc-main-card { background: #ffffff; border: 1px solid #eef0f2; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); box-sizing: border-box; width: 100%; min-height: 450px; position: relative; }
+    @media (min-width: 768px) { #zrc-donation-widget .zrc-main-card { padding: 35px; min-height: 550px; } }
+    #zrc-donation-widget .zrc-header { display: flex; flex-direction: column; align-items: center; gap: 15px; border-bottom: 1px solid #e9ecef; padding-bottom: 20px; margin-bottom: 25px; }
+    @media (min-width: 768px) { #zrc-donation-widget .zrc-header { flex-direction: row; justify-content: space-between; gap: 20px; } }
+    #zrc-donation-widget .zrc-header-methods { display: flex; gap: 8px; background: #f1f3f5; padding: 4px; border-radius: 30px; align-items: center; overflow-x: auto; max-width: 100%; box-sizing: border-box; }
+    #zrc-donation-widget .zrc-tab { background: transparent; border: none; border-radius: 20px; padding: 8px 16px; margin: 0; display: inline-flex; align-items: center; font-weight: bold; font-size: 0.85rem; color: #495057; cursor: not-allowed; transition: all 0.2s ease; opacity: 0.4; pointer-events: none; white-space: nowrap; user-select: none; }
+    #zrc-donation-widget .zrc-header-methods.step-2-enabled .zrc-tab { opacity: 0.8; cursor: pointer; pointer-events: auto; }
+    #zrc-donation-widget .zrc-header-methods.step-2-enabled .zrc-tab:hover { background: #dee2e6; color: #212529; opacity: 1; }
+    #zrc-donation-widget .zrc-header-methods.step-2-enabled .zrc-tab.active { background: #e21a22; color: #ffffff; opacity: 1; }
+    #zrc-donation-widget .zrc-amount-box { text-align: center; width: 100%; }
+    @media (min-width: 768px) { #zrc-donation-widget .zrc-amount-box { text-align: right; width: auto; } }
+    #zrc-donation-widget .zrc-amount-label { display: block; font-size: 0.7rem; font-weight: bold; color: #868e96; letter-spacing: 1px; margin-bottom: 2px; }
+    #zrc-donation-widget .zrc-amount-val { font-size: 1.3rem; font-weight: 800; color: #1a1a1a; }
+    #zrc-donation-widget .zrc-currency-tag { font-size: 0.8rem; font-weight: bold; color: #6c757d; background: #f1f3f5; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+    #zrc-donation-widget .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+    @media (min-width: 768px) { #zrc-donation-widget .amount-grid { gap: 12px; } }
+    #zrc-donation-widget .amount-pill { background: #f8f9fa; border: 2px solid #f1f3f5; padding: 10px; font-size: 0.9rem; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; color: #495057; }
+    @media (min-width: 768px) { #zrc-donation-widget .amount-pill { padding: 14px; font-size: 1rem; } }
+    #zrc-donation-widget .amount-pill:hover, #zrc-donation-widget .amount-pill.active { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border-color: #e21a22; box-shadow: 0 4px 10px rgba(226, 26, 34, 0.2); }
+    #zrc-donation-widget .custom-amount-wrapper { position: relative; margin-bottom: 15px; }
+    #zrc-donation-widget .custom-amount-input { width: 100%; padding: 12px; font-size: 1.15rem; font-weight: bold; border: 2px solid #e9ecef; border-radius: 8px; box-sizing: border-box; padding-right: 110px; color: #212529; }
+    #zrc-donation-widget .custom-amount-input:focus { border-color: #e21a22; outline: none; }
+    #zrc-donation-widget .currency-select { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background-color: #f1f3f5; font-weight: bold; font-size: 1rem; color: #495057; padding: 10px 12px; border-radius: 6px; }
+    #zrc-donation-widget .form-group { margin-bottom: 18px; text-align: left; }
+    #zrc-donation-widget .form-label { display: block; font-size: 0.9rem; font-weight: bold; color: #495057; margin-bottom: 6px; }
+    #zrc-donation-widget .form-text-input { width: 100%; padding: 10px 12px; border: 2px solid #e9ecef; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; color: #333; }
+    #zrc-donation-widget .form-text-input:focus { border-color: #e21a22; outline: none; }
+    #zrc-donation-widget .inline-checkbox-group { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+    #zrc-donation-widget .inline-checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+    #zrc-donation-widget .inline-checkbox-group label { font-size: 0.9rem; font-weight: bold; color: #495057; cursor: pointer; }
+    #zrc-donation-widget .submit-donation-btn { background: linear-gradient(135deg, #e21a22 0%, #ff3b42 100%); color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 1.05rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(226, 26, 34, 0.3); transition: all 0.3s ease; }
+    #zrc-donation-widget .submit-donation-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
+    #zrc-donation-widget .bank-details-box { background: #fff8f8; border: 1px dashed #e21a22; border-radius: 8px; padding: 15px; margin-bottom: 18px; text-align: left; }
+    #zrc-donation-widget .bank-detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; color: #495057; }
+    #zrc-donation-widget .state-container { display: none; position: relative; width: 100%; min-height: 350px; }
+    #zrc-donation-widget .state-container.active { display: block; }
+    #zrc-donation-widget .state-loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 15px; color: #868e96; font-weight: bold; text-align: center; width: 100%; }
+    #zrc-donation-widget .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #e21a22; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
 
 <div id="zrc-donation-widget">
-    <div class="zrc-main-card">
-        <div class="zrc-header">
-            <div class="zrc-header-methods">
-                <div class="zrc-tab active" id="tab-momo" onclick="selectMethod(&apos;momo&apos;, this)">
-                    Mobile Money
-                </div>
-                <div class="zrc-tab" id="tab-card" onclick="selectMethod(&apos;card&apos;, this)">
-                    Card Payment
-                </div>
-                <div class="zrc-tab" id="tab-bank" onclick="selectMethod(&apos;bank&apos;, this)">
-                    Bank Transfer
-                </div>
-            </div>
-            <div class="zrc-amount-box">
-                <span class="zrc-amount-label">DONATION AMOUNT</span> <span class="zrc-amount-val" id="header-amount-val">50.00</span> <span class="zrc-currency-tag" id="header-currency-tag">ZMW</span>
-            </div>
-        </div>
-        <div id="step-1-state">
-            <div class="amount-grid">
-                <div class="amount-pill active" onclick="selectAmount(50, this)">
-                    50
-                </div>
-                <div class="amount-pill" onclick="selectAmount(100, this)">
-                    100
-                </div>
-                <div class="amount-pill" onclick="selectAmount(250, this)">
-                    250
-                </div>
-                <div class="amount-pill" onclick="selectAmount(500, this)">
-                    500
-                </div>
-                <div class="amount-pill" onclick="selectAmount(1000, this)">
-                    1000
-                </div>
-                <div class="amount-pill" onclick="selectAmount(&apos;&apos;, this, true)">
-                    Custom
-                </div>
-            </div>
-            <div class="custom-amount-wrapper">
-                <input class="custom-amount-input" type="number" id="donation-amount" value="50" oninput="updateAmountDisplay()"> <select class="currency-select" id="currency-picker" onchange="updateAmountDisplay()">
-                                                                                                    <option value="ZMW" selected="">ZMW</option>
-                                                                                                    <option value="USD">USD</option>
-                                                                                                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Your Name</label> <input class="form-text-input" type="text" id="donor-name" placeholder="Enter your name">
-            </div>
-            <div class="inline-checkbox-group">
-                <input type="checkbox" id="is-anonymous" onchange="toggleAnonymous()"> <label for="is-anonymous">Make this donation anonymous</label>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Add Comment / Message (Optional)</label> <textarea class="form-text-input" style="min-height:60px;resize:vertical;" id="donor-message"></textarea>
-            </div>
-            <p>
-                <button class="submit-donation-btn" id="next-button" onclick="goToStepTwo(); document.querySelector(&apos;.zrc-header-methods&apos;).classList.add(&apos;step-2-enabled&apos;);">Next: Choose Payment</button>
-            </p>
-        </div>
-        <div style="display:none;" id="step-2-state">
-            <!-- GLOBAL PHONE INPUT (Visible for both Momo & Card) -->
-            <div class="form-group">
-                <label class="form-label">Mobile Number (Required for receipt & verification)</label> 
-                <input class="form-text-input" type="tel" id="momo-number" placeholder="e.g. 057XXXXXXXX or 097XXXXXXXX">
-            </div>
-            
-            <div id="momo-fields-container">
-                <div class="form-group">
-                    <label class="form-label">Select Mobile Network</label> <select class="form-text-input" id="momo-network">
-                                                                                                                            <option value="mtn">MTN Zambia</option>
-                                                                                                                            <option value="airtel">Airtel Zambia</option>
-                                                                                                                            <option value="zamtel">Zamtel Zambia</option>
-                                                                                                                        </select>
-                </div>
-            </div>
-            <div style="display:none;" id="card-fields-container">
-                <div class="secure-redirect-notice">
-                    <p>
-                        <strong>Secure Checkout:</strong> Card processing occurs on Tingg's encrypted server. You will be redirected after clicking Pay.
-                    </p>
-                </div>
-            </div>
-            <div style="display:none;" id="bank-fields-container">
-                <div class="bank-details-box">
-                    <h4 style="color:#e21a22;font-size:0.85rem;margin:0 0 10px 0;">
-                        <strong>Zambia Red Cross Society Account:</strong>
-                    </h4>
-                    <div class="bank-detail-row">
-                        <strong>Bank Name:</strong> <span>Standard Chartered</span>
-                    </div>
-                    <div class="bank-detail-row">
-                        <strong>Account Name:</strong> <span>Zambia Red Cross Society</span>
-                    </div>
-                    <div class="bank-detail-row">
-                        <strong>Account Number:</strong> <span>01001100XXXXX</span>
-                    </div>
-                    <div class="bank-detail-row">
-                        <strong>Branch:</strong> <span>Lusaka Main Branch</span>
-                    </div>
-                </div>
-            </div>
-            <p>
-                <button class="submit-donation-btn" id="pay-button" onclick="recordAndSubmit()">Pay ZMW 50.00</button>
-            </p>
-            <div style="margin-top:15px;text-align:center;">
-                <a class="modal-cancel-btn" onclick="returnToStepOne(); document.querySelector(&apos;.zrc-header-methods&apos;).classList.remove(&apos;step-2-enabled&apos;);">← Edit Details</a>
-            </div>
-        </div>
-        <div class="state-container" id="iframe-state">
-            <div class="state-loader" id="loader-view">
-                <div class="spinner">
-                    &nbsp;
-                </div>
-                <p id="loading-text">
-                    Processing transaction...
-                </p>
-            </div>
-            <div class="state-loader" style="display:none;" id="success-view">
-                <h3 style="color:#25a75c;">
-                    Thank You!
-                </h3>
-                <p id="success-message">
-                    Processing...
-                </p>
-                <p>
-                    <button class="submit-donation-btn" style="background-color:#25a75c;margin-top:30px;" onclick="location.reload()">Make Another Donation</button>
-                </p>
-            </div>
-        </div>
+  <div class="zrc-main-card">
+    <div class="zrc-header">
+      <div class="zrc-header-methods">
+        <div class="zrc-tab active" id="tab-momo" onclick="selectMethod('momo', this)">Mobile Money</div>
+        <div class="zrc-tab" id="tab-card" onclick="selectMethod('card', this)">Card Payment</div>
+        <div class="zrc-tab" id="tab-bank" onclick="selectMethod('bank', this)">Bank Transfer</div>
+      </div>
+      <div class="zrc-amount-box">
+        <span class="zrc-amount-label">DONATION AMOUNT</span>
+        <span class="zrc-amount-val" id="header-amount-val">50.00</span>
+        <span class="zrc-currency-tag" id="header-currency-tag">ZMW</span>
+      </div>
     </div>
+
+    <!-- Step 1 -->
+    <div id="step-1-state">
+      <div class="amount-grid">
+        <div class="amount-pill active" onclick="selectAmount(50, this)">50</div>
+        <div class="amount-pill" onclick="selectAmount(100, this)">100</div>
+        <div class="amount-pill" onclick="selectAmount(250, this)">250</div>
+        <div class="amount-pill" onclick="selectAmount(500, this)">500</div>
+        <div class="amount-pill" onclick="selectAmount(1000, this)">1000</div>
+        <div class="amount-pill" onclick="selectAmount('', this, true)">Custom</div>
+      </div>
+      <div class="custom-amount-wrapper">
+        <input class="custom-amount-input" type="number" id="donation-amount" value="50" oninput="updateAmountDisplay()">
+        <select class="currency-select" id="currency-picker" onchange="updateAmountDisplay()">
+          <option value="ZMW" selected>ZMW</option>
+          <option value="USD">USD</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input class="form-text-input" type="text" id="donor-name" placeholder="Enter your name">
+      </div>
+      <div class="inline-checkbox-group">
+        <input type="checkbox" id="is-anonymous" onchange="toggleAnonymous()">
+        <label for="is-anonymous">Make this donation anonymous</label>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Add Comment / Message (Optional)</label>
+        <textarea class="form-text-input" style="min-height:60px;resize:vertical;" id="donor-message"></textarea>
+      </div>
+      <p>
+        <button class="submit-donation-btn" id="next-button" onclick="goToStepTwo(); document.querySelector('.zrc-header-methods').classList.add('step-2-enabled');">Next: Choose Payment</button>
+      </p>
+    </div>
+
+    <!-- Step 2 -->
+    <div style="display:none;" id="step-2-state">
+      <div class="form-group">
+        <label class="form-label">Mobile Number (For receipt & verification)</label> 
+        <input class="form-text-input" type="tel" id="momo-number" placeholder="e.g. 097XXXXXXXX or 096XXXXXXXX">
+      </div>
+      
+      <div id="momo-fields-container">
+        <div class="form-group">
+          <label class="form-label">Select Mobile Network</label>
+          <select class="form-text-input" id="momo-network">
+            <option value="airtel">Airtel Zambia</option>
+            <option value="mtn">MTN Zambia</option>
+            <option value="zamtel">Zamtel Zambia</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:none;" id="card-fields-container">
+        <div class="form-group" style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:12px;margin-bottom:15px;">
+          <p style="font-size:0.9rem;color:#495057;margin:0;">
+            🔒 <strong>Secure Card Processing:</strong> You will be redirected to Tingg's encrypted PCI-DSS portal to enter your Visa or Mastercard details securely.
+          </p>
+        </div>
+      </div>
+
+      <div style="display:none;" id="bank-fields-container">
+        <div class="bank-details-box">
+          <h4 style="color:#e21a22;font-size:0.85rem;margin:0 0 10px 0;"><strong>Zambia Red Cross Society Account:</strong></h4>
+          <div class="bank-detail-row"><strong>Bank Name:</strong> <span>Standard Chartered</span></div>
+          <div class="bank-detail-row"><strong>Account Name:</strong> <span>Zambia Red Cross Society</span></div>
+          <div class="bank-detail-row"><strong>Account Number:</strong> <span>01001100XXXXX</span></div>
+          <div class="bank-detail-row"><strong>Branch:</strong> <span>Lusaka Main Branch</span></div>
+        </div>
+      </div>
+
+      <p>
+        <button class="submit-donation-btn" id="pay-button" onclick="recordAndSubmit()">Pay ZMW 50.00</button>
+      </p>
+      <div style="margin-top:15px;text-align:center;">
+        <a style="color:#6c757d;text-decoration:none;font-weight:bold;cursor:pointer;" onclick="returnToStepOne(); document.querySelector('.zrc-header-methods').classList.remove('step-2-enabled');">← Edit Details</a>
+      </div>
+    </div>
+
+    <!-- Processing State -->
+    <div class="state-container" id="iframe-state">
+      <div class="state-loader" id="loader-view">
+        <div class="spinner"></div>
+        <p id="loading-text" style="margin-top:15px;">Connecting securely to payment gateway...</p>
+      </div>
+      <div class="state-loader" style="display:none;" id="success-view">
+        <h3 style="color:#25a75c;">Thank You!</h3>
+        <p id="success-message">Processing...</p>
+        <p><button class="submit-donation-btn" style="background-color:#25a75c;margin-top:30px;" onclick="location.reload()">Make Another Donation</button></p>
+      </div>
+    </div>
+
+  </div>
 </div>
+
 <script>
   let selectedMethod = 'momo';
   let isProcessing = false;
-  let pollingInterval;
   
   const API_ENDPOINT = 'https://zrc-payment-backend.vercel.app/api/checkout';
-  const STATUS_ENDPOINT = 'https://zrc-payment-backend.vercel.app/api/status';
-  const SUCCESS_PAGE_URL = "https://www.redcross.org.zm/donation-success";
 
   function selectAmount(val, element, isCustom = false) {
     document.querySelectorAll('.amount-pill').forEach(p => p.classList.remove('active'));
@@ -268,12 +198,6 @@
     document.getElementById('header-currency-tag').innerText = currency;
     const payBtn = document.getElementById('pay-button');
     if (payBtn) payBtn.innerText = `Pay ${currency} ${parseFloat(amount).toFixed(2)}`;
-    const tabs = document.querySelectorAll('.zrc-tab');
-    if (parseFloat(amount) > 0) {
-      tabs.forEach(t => t.classList.add('enabled'));
-    } else {
-      tabs.forEach(t => t.classList.remove('enabled'));
-    }
   }
 
   function goToStepTwo() {
@@ -284,7 +208,6 @@
   }
 
   function returnToStepOne() {
-    if (pollingInterval) clearInterval(pollingInterval);
     document.getElementById('step-2-state').style.display = 'none';
     document.getElementById('step-1-state').style.display = 'block';
   }
@@ -298,41 +221,15 @@
     document.getElementById('bank-fields-container').style.display = (type === 'bank') ? 'block' : 'none';
   }
 
-  function startStatusPolling(merchantTxnId) {
-    let attempts = 0;
-    const maxAttempts = 30;
-    const amount = document.getElementById('donation-amount').value;
-    const currency = document.getElementById('currency-picker').value;
-    
-    pollingInterval = setInterval(async () => {
-      attempts++;
-      if (attempts > maxAttempts) {
-        clearInterval(pollingInterval);
-        document.getElementById('success-message').innerHTML = `<strong>Verification Timeout</strong><br>Please contact support if money was deducted.`;
-        return;
-      }
-      try {
-        const response = await fetch(`${STATUS_ENDPOINT}?merchant_transaction_id=${merchantTxnId}&amount=${amount}&currency=${currency}&t=${Date.now()}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.is_paid === true) {
-            clearInterval(pollingInterval);
-            (window.top || window).location.href = SUCCESS_PAGE_URL;
-          }
-        }
-      } catch (err) { console.error(err); }
-    }, 4000);
-  }
-
   async function recordAndSubmit() {
     if (isProcessing) return;
     const amount = document.getElementById('donation-amount').value;
     if (!amount || parseFloat(amount) <= 0) { alert("Please enter a valid amount."); return; }
-    
-    const momoNumber = document.getElementById('momo-number').value.trim();
-    const phoneDigits = momoNumber.replace(/\D/g, '');
+
+    const phoneInput = document.getElementById('momo-number').value.trim();
+    const phoneDigits = phoneInput.replace(/\D/g, '');
     if (!phoneDigits || phoneDigits.length < 9) {
-      alert("Please enter a valid mobile number for verification and receipt.");
+      alert("Please enter a valid phone number for receipt & verification.");
       return;
     }
 
@@ -347,7 +244,7 @@
       donationCurrency: document.getElementById('currency-picker').value,
       messageText: document.getElementById('donor-message').value,
       paymentMethod: selectedMethod,
-      phoneNumber: momoNumber,
+      phoneNumber: phoneInput,
       network: document.getElementById('momo-network').value
     };
 
@@ -355,8 +252,6 @@
     document.getElementById('step-2-state').style.display = 'none';
     document.getElementById('iframe-state').style.display = 'block';
     document.getElementById('iframe-state').classList.add('active');
-    document.getElementById('loader-view').style.display = 'flex';
-    document.getElementById('success-view').style.display = 'none';
 
     try {
       const res = await fetch(API_ENDPOINT, {
@@ -368,17 +263,11 @@
       const data = await res.json();
 
       if (res.ok && (data.status === 'success' || data.success === true)) {
-        // BREAK OUT OF IFRAME DIRECTLY TO TINGG
         if (data.redirect_url) {
-          console.log("Redirecting to Tingg...");
+          // CRITICAL: Full-window redirect so 3D Secure / OTP loads with zero iframe blocks
           (window.top || window).location.href = data.redirect_url;
-        } else if (selectedMethod === 'momo') {
-          document.getElementById('loader-view').style.display = 'none';
-          document.getElementById('success-view').style.display = 'flex';
-          document.getElementById('success-message').innerHTML = `<strong>Initiated Successfully!</strong><br>Please check your phone for the PIN prompt.`;
-          startStatusPolling(data.merchant_transaction_id);
         } else {
-          throw new Error("Secure payment link not received.");
+          throw new Error("Payment URL was not returned by gateway.");
         }
       } else {
         throw new Error(data.error || 'Transaction failed');
@@ -397,3 +286,5 @@
 
   document.addEventListener('DOMContentLoaded', updateAmountDisplay);
 </script>
+</body>
+</html>
